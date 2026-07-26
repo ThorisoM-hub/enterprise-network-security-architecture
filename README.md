@@ -140,6 +140,9 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
         |  --> Provides clean power conditioning, baseline surge protection, and power backup.  |
         =========================================================================================
 
+
+
+
 ---
 🎯 Perimeter vs. Internal Boundary Separation
 With the physical network topology upgraded to include an edge security appliance labeled NGFW, the network implements a clear defense-in-depth model:
