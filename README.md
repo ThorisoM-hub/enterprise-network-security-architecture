@@ -142,7 +142,7 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
 
 
 
-
+```text
 ---
 ## 🎯 Perimeter vs. Internal Boundary Separation
 
