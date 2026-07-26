@@ -1,5 +1,4 @@
-# Implementing Enterprise Network
-Segmentation (VLANs), ACLs, NAT/PAT, IPsec VPN, and OSPF using Cisco Packet Tracer
+# Implementing Enterprise Network Segmentation (VLANs), ACLs, NAT/PAT, IPsec VPN, and OSPF using Cisco Packet Tracer
 
 ## 📌 Overview
 
