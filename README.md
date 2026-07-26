@@ -219,7 +219,6 @@ To maximize enterprise accuracy, our datacenter zone maps dedicated functional s
 ## ⚙️ Step-by-Step Configuration Guide
 
 ### Step 1 – Create and Name VLANs on the Switch
-
 Initialize the broadcast domains on the Layer 2 switch and associate active access interfaces with their designated departments.
 
 ```text
@@ -229,7 +228,56 @@ Switch# configure terminal
 ! Initialize Corporate VLAN Databases
 Switch(config)# vlan 10
 Switch(config-vlan)# name Finance
-...
+Switch(config)# vlan 15
+Switch(config-vlan)# name Admin
+Switch(config)# vlan 20
+Switch(config-vlan)# name HR
+Switch(config)# vlan 30
+Switch(config-vlan)# name IT
+Switch(config)# vlan 40
+Switch(config-vlan)# name Guest
+Switch(config)# vlan 50
+Switch(config-vlan)# name IoT_and_Printers
+Switch(config)# vlan 99
+Switch(config-vlan)# name Out-of-Band_Mgmt
+Switch(config)# vlan 100
+Switch(config-vlan)# name DMZ_Server_Farm
+Switch(config)# exit
+
+! Assign Hardware Interfaces to Respective VLAN Domains
+Switch(config)# interface fa0/1
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 10
+
+Switch(config)# interface fa0/2
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 15
+
+Switch(config)# interface fa0/3
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 20
+
+Switch(config)# interface fa0/4
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 30
+
+Switch(config)# interface fa0/5
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 40
+
+! Assign Hardware Port for the IoT Devices & Network Printers
+Switch(config)# interface fa0/10
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 50
+
+! Assign Hardware Ports for Wired Surveillance Cameras and NVR Hubs
+Switch(config)# interface fa0/11
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 50
+
+Switch(config)# interface fa0/12
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 50
 Switch(config-if)# exit
 ```
 
@@ -244,7 +292,7 @@ Switch(config-if)# switchport mode trunk
 Switch(config-if)# switchport trunk allowed vlan 10,15,20,30,40,50,99,100
 Switch(config-if)# exit
 
-! Trunk to Wireless Access Point
+! Trunk to Wireless Access Point (Aggregating Secure departments, Guest, and IoT Wireless SSIDs)
 Switch(config)# interface fa0/6
 Switch(config-if)# description Trunk Link to Corporate Wireless Access Point
 Switch(config-if)# switchport mode trunk
@@ -254,128 +302,122 @@ Switch(config-if)# exit
 
 ### Step 3 – Configure Router-on-a-Stick (Logical Subinterfaces)
 
-Create logical subinterfaces on the router's physical interface.
+Create logical subinterfaces on the router's physical interface. Each subinterface tags and terminates traffic for its respective VLAN using standard 802.1Q encapsulation.
 
 ```text
 Router> enable
 Router# configure terminal
 
+! Interface cleanup and activation
 Router(config)# interface g0/0
 Router(config-if)# no shutdown
 Router(config-if)# exit
 
+! Subinterface for VLAN 10 (Finance Dept & File Storage Vault)
 Router(config)# interface g0/0.10
+Router(config-subif)# description Default Gateway for Finance
 Router(config-subif)# encapsulation dot1Q 10
 Router(config-subif)# ip address 192.168.10.1 255.255.255.0
-...
+Router(config-subif)# exit
+
+! Subinterface for VLAN 15 (Admin / Exec Suite - CEO/COO/CFO)
+Router(config)# interface g0/0.15
+Router(config-subif)# description Default Gateway for Admin
+Router(config-subif)# encapsulation dot1Q 15
+Router(config-subif)# ip address 192.168.15.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 20 (HR & Local Administrative Share)
+Router(config)# interface g0/0.20
+Router(config-subif)# description Default Gateway for HR
+Router(config-subif)# encapsulation dot1Q 20
+Router(config-subif)# ip address 192.168.20.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 30 (IT / SOC / IAM / Secure Wireless Hub)
+Router(config)# interface g0/0.30
+Router(config-subif)# description Default Gateway for IT/SOC/IAM
+Router(config-subif)# encapsulation dot1Q 30
+Router(config-subif)# ip address 192.168.30.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 40 (Guest Mobility Domain)
+Router(config)# interface g0/0.40
+Router(config-subif)# description Default Gateway for Guests
+Router(config-subif)# encapsulation dot1Q 40
+Router(config-subif)# ip address 192.168.40.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 50 (IoT & Quarantined Printer Peripherals / CCTV Network)
+Router(config)# interface g0/0.50
+Router(config-subif)# description Default Gateway for IoT, MFPs, and CCTV
+Router(config-subif)# encapsulation dot1Q 50
+Router(config-subif)# ip address 192.168.50.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 99 (Out-of-Band Management Environment)
+Router(config)# interface g0/0.99
+Router(config-subif)# description Default Gateway for OOBM
+Router(config-subif)# encapsulation dot1Q 99
+Router(config-subif)# ip address 192.168.99.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 100 (Hardened DMZ Cluster Tier)
+Router(config)# interface g0/0.100
+Router(config-subif)# description Default Gateway for Hardened DMZ
+Router(config-subif)# encapsulation dot1Q 100
+Router(config-subif)# ip address 192.168.100.1 255.255.255.0
 Router(config-subif)# exit
 ```
 
 ### Step 4 – Configure Centralized DHCP Scopes
 
-Automate IP address assignment using DHCP.
+Automate network scaling, asset tracking, and device management profiles by executing dynamic lease scopes directly on the router's localized pools:
 
 ```text
+! Exclude default gateway tracking and static infrastructure server IPs from scope distribution
 Router(config)# ip dhcp excluded-address 192.168.10.1 192.168.10.99
-...
+Router(config)# ip dhcp excluded-address 192.168.15.1 192.168.15.9
+Router(config)# ip dhcp excluded-address 192.168.20.1 192.168.20.99
+Router(config)# ip dhcp excluded-address 192.168.30.1 192.168.30.99
+Router(config)# ip dhcp excluded-address 192.168.40.1 192.168.40.9
+Router(config)# ip dhcp excluded-address 192.168.50.1 192.168.50.99
+
+! Configure pools per segment
 Router(config)# ip dhcp pool Finance_Pool
-...
+Router(dhcp-config)# network 192.168.10.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.10.1
+Router(dhcp-config)# dns-server 192.168.30.100
+Router(dhcp-config)# exit
+
+Router(config)# ip dhcp pool Admin_Pool
+Router(dhcp-config)# network 192.168.15.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.15.1
+Router(dhcp-config)# dns-server 192.168.30.100
+Router(dhcp-config)# exit
+
+Router(config)# ip dhcp pool HR_Pool
+Router(dhcp-config)# network 192.168.20.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.20.1
+Router(dhcp-config)# dns-server 192.168.30.100
+Router(dhcp-config)# exit
+
+Router(config)# ip dhcp pool IT_Pool
+Router(dhcp-config)# network 192.168.30.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.30.1
+Router(dhcp-config)# dns-server 192.168.30.100
+Router(dhcp-config)# exit
+
+Router(config)# ip dhcp pool Guest_Pool
+Router(dhcp-config)# network 192.168.40.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.40.1
+Router(dhcp-config)# exit
+
+Router(config)# ip dhcp pool IoT_Pool
+Router(dhcp-config)# network 192.168.50.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.50.1
 Router(dhcp-config)# exit
 ```
-
----
-
-## 🔄 The Automated Handshake: How Devices Get an IP (D.O.R.A.)
-
-When an unconfigured asset attaches to an access port or connects to a wireless SSID, it follows the standard DHCP DORA process:
-
-- **Discover** – Client broadcasts for a DHCP server.
-- **Offer** – Router offers an available address.
-- **Request** – Client requests the offered lease.
-- **Acknowledge** – Router confirms the lease.
-
-### Step 5 – Configure Access Control Lists (Core Security Optimization)
-
-Extended ACLs enforce inter-VLAN security policies.
-
-```text
-! ====================================================================
-! 1. DEFINE ACCESS CONTROL LISTS
-! ====================================================================
-
-Router(config)# ip access-list extended ADMIN_INBOUND_ACL
-...
-Router(config)# interface g0/0.100
-Router(config-subif)# ip access-group DMZ_INBOUND_ACL in
-Router(config-subif)# exit
-```
-
----
-
-## 🧪 Verification & Testing Validation
-
-### Automated Test Cases Matrix
-
-| Test Case ID | Traffic Source Host | Destination Target | Expected Behaviour | Status |
-|--------------|---------------------|--------------------|--------------------|--------|
-| TC-01a | Guest Kiosk PC | Finance/Admin PC | Blocked | ✅ |
-| ... | ... | ... | ... | ... |
-
----
-
-## ⚙️ Core Skills Demonstrated
-
-- VLAN Segmentation & Broadcast Domain Isolation
-- Inter-VLAN Routing (Router-on-a-Stick)
-- Access Control Lists (ACLs)
-- DHCP Configuration
-- RBAC
-- Network Troubleshooting
-
----
-
-## 🛡️ Advanced Engineering Defense Strategies
-
-...
-
----
-
-## 🔐 Security Implementation Summary
-
-...
-
----
-
-## 📊 Results Summary
-
-...
-
----
-
-## 🧾 Conclusion
-
-...
-
----
-
-## 🏆 Career Relevance Mapping
-
-...
-
----
-
-## 🏁 Project Status
-
-- ✅ Lab State: COMPLETED
-- ✅ Testing Coverage: 100% SUCCESSFUL
-- ✅ Policy Verification: VALIDATED & LOCKED
-
----
-
-## 🔖 Project Hashtags
-
-`#CyberSecurity` `#SOC` `#IAM` `#Networking` `#VLAN` `#ACL` `#CiscoPacketTracer` `#ITSecurity` `#EthicalHacking` `#NetworkSecurity` `#PortfolioProject`
-
 
 
 
