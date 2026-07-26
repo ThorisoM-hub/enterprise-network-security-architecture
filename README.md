@@ -140,6 +140,7 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
         |  --> Provides clean power conditioning, baseline surge protection, and power backup.  |
         =========================================================================================
 
+---
 🎯 Perimeter vs. Internal Boundary Separation
 With the physical network topology upgraded to include an edge security appliance labeled NGFW, the network implements a clear defense-in-depth model:
  * Active Internal Enforcement (Cisco Router ACLs): All inter-VLAN, role-based blocking rules (East-West traffic) are configured on the 2911 Edge Router via Extended Access Control Lists applied explicitly to logical subinterfaces. This ensures local containment so unprivileged internal subnets cannot reach restricted databases, identity directories, or backend storage segments.
