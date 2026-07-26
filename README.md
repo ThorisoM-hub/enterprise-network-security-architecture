@@ -140,7 +140,7 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
         |  --> Provides clean power conditioning, baseline surge protection, and power backup.  |
         =========================================================================================
 
-
+```
 
 ## 🎯 Perimeter vs. Internal Boundary Separation
 
