@@ -419,6 +419,96 @@ Router(dhcp-config)# default-router 192.168.50.1
 Router(dhcp-config)# exit
 ```
 
+🔄 The Automated Handshake: How Devices Get an IP (D.O.R.A.)
+
+When an unconfigured asset attaches to an access port or logs into a wireless SSID broadcast, it initiates a native 4-stage broadcast handshake sequence with the automated infrastructure engine on the 2911 router:
+
+- **Discover (Client Broadcast):** The unprovisioned endpoint floods the layer 2 domain seeking an identity: *"Is there an authoritative address coordinator available? I require parameters."*
+
+- **Offer (Router Unicast/Broadcast):** The 2911 intercepts the frame via its designated subinterface (e.g., g0/0.10), references the active pool tracking data, and proposes parameters: *"Acknowledged. I manage the 192.168.10.0/24 zone. Here is an available target lease."*
+
+- **Request (Client Broadcast):** The endpoint locks down the proposed parameters across the domain: *"Confirmed. I formally request a lease assignment on this specific allocation."*
+
+- **Acknowledge (Router Unicast/Broadcast):** The router completes the transaction, logging the device's physical MAC footprint inside its active state table: *"Transaction locked. Your configuration lease is active; default gateways, parameters, and central Active Directory DNS mappings are pushed."*
+
+---
+
+## Step 5 – Configure Access Control Lists (Core Security Optimization)
+
+To implement functional Inter-VLAN security boundaries within Cisco IOS Router-on-a-Stick deployments, Extended Access Control Lists are mapped precisely to logical subinterfaces.
+
+```text
+! ====================================================================
+! 1. DEFINE ACCESS CONTROL LISTS
+! ====================================================================
+
+! --- ACL for Executive Suite / Admin Tiers (VLAN 15) ---
+Router(config)# ip access-list extended ADMIN_INBOUND_ACL
+Router(config-ext-nacl)# permit tcp any any established
+Router(config-ext-nacl)# deny ip 192.168.15.0 0.0.0.255 host 192.168.10.50
+Router(config-ext-nacl)# permit ip any any
+Router(config-ext-nacl)# exit
+
+! --- ACL for HR & Administration (VLAN 20) ---
+Router(config)# ip access-list extended HR_INBOUND_ACL
+Router(config-ext-nacl)# permit tcp any any established
+Router(config-ext-nacl)# deny ip 192.168.20.0 0.0.0.255 192.168.30.0 0.0.0.255
+Router(config-ext-nacl)# permit ip any any
+Router(config-ext-nacl)# exit
+
+! --- ACL for Guest Space Mobility Domain (VLAN 40) ---
+Router(config)# ip access-list extended GUEST_INBOUND_ACL
+Router(config-ext-nacl)# deny ip 192.168.40.0 0.0.0.255 192.168.0.0 0.0.255.255
+Router(config-ext-nacl)# permit ip any any
+Router(config-ext-nacl)# exit
+
+! --- ACL for IoT & Hardened Printer Domain (VLAN 50) ---
+Router(config)# ip access-list extended IOT_INBOUND_ACL
+Router(config-ext-nacl)# deny ip 192.168.50.0 0.0.0.255 192.168.0.0 0.0.255.255
+Router(config-ext-nacl)# permit ip any any
+Router(config-ext-nacl)# exit
+
+! --- ACL for Out-of-Band Management Tier (VLAN 99) ---
+Router(config)# ip access-list extended OOBM_INBOUND_ACL
+Router(config-ext-nacl)# permit ip host 192.168.99.100 any
+Router(config-ext-nacl)# deny ip any any
+Router(config-ext-nacl)# exit
+
+! --- ACL for Hardened DMZ Server Farm (VLAN 100) ---
+Router(config)# ip access-list extended DMZ_INBOUND_ACL
+Router(config-ext-nacl)# permit tcp any any established
+Router(config-ext-nacl)# deny ip 192.168.100.0 0.0.0.255 192.168.0.0 0.0.255.255
+Router(config-ext-nacl)# permit ip any any
+Router(config-ext-nacl)# exit
+
+! ====================================================================
+! 2. BIND ACCESS CONTROL LISTS TO LOGICAL SUBINTERFACES (INGRESS)
+! ====================================================================
+
+Router(config)# interface g0/0.15
+Router(config-subif)# ip access-group ADMIN_INBOUND_ACL in
+Router(config-subif)# exit
+
+Router(config)# interface g0/0.20
+Router(config-subif)# ip access-group HR_INBOUND_ACL in
+Router(config-subif)# exit
+
+Router(config)# interface g0/0.40
+Router(config-subif)# ip access-group GUEST_INBOUND_ACL in
+Router(config-subif)# exit
+
+Router(config)# interface g0/0.50
+Router(config-subif)# ip access-group IOT_INBOUND_ACL in
+Router(config-subif)# exit
+
+Router(config)# interface g0/0.99
+Router(config-subif)# ip access-group OOBM_INBOUND_ACL in
+Router(config-subif)# exit
+
+Router(config)# interface g0/0.100
+Router(config-subif)# ip access-group DMZ_INBOUND_ACL in
+Router(config-subif)# exit
+```
 
 
 
