@@ -142,8 +142,6 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
 
 
 
-```text
----
 ## 🎯 Perimeter vs. Internal Boundary Separation
 
 With the physical network topology upgraded to include an edge security appliance labeled NGFW, the network implements a clear defense-in-depth model:
