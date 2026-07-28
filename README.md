@@ -8,21 +8,6 @@ The network is divided into multiple departments using VLANs, with controlled co
 
 ---
 
-## 📡 Enterprise Multi-SSID Wireless Infrastructure Matrix
-
-To align with your updated department mapping and extend role-based network containment across the mobility domain without deploying redundant physical hardware layers, the enterprise wireless architecture utilizes a single physical Wireless Access Point (WAP) array to broadcast three separate Service Set Identifiers (SSIDs). **Company PCs are strictly hardwired via Ethernet; Wi-Fi is reserved exclusively for smartphones and mobile endpoints.**
-
-*   **SSID:** `Corporate-Secure`
-    *   **Logical Network Bind:** VLAN 30 (IT / SOC / IAM Core), VLAN 10 (Finance), VLAN 15 (Executive Suite), and VLAN 20 (HR & Administration)
-    *   **Target Scope:** Automatically maps authorized internal corporate **smartphones** to their respective departments based on their identity profiles. 
-*   **SSID:** `Corporate-Guest`
-    *   **Logical Network Bind:** VLAN 40 (Guest Space Tier)
-    *   **Target Scope:** Provisioned exclusively for visitor smartphones and non-employee mobile infrastructure access.
-*   **SSID:** `Corporate-IoT`
-    *   **Logical Network Bind:** VLAN 50 (Hardened IoT & Surveillance Zone)
-    *   **Target Scope:** Isolates facility smart systems, building management controllers, and wireless CCTV cameras scattered across the property.
-
----
 
 ## 🏢 Architectural Realities: Physical vs. Logical Deployment
 
@@ -169,7 +154,21 @@ The section below maps the logical topology directly onto physical corporate inf
 * **Vulnerability Management Baseline Enforcement:** 100% of unused physical switch ports and interface slots are administratively shut down (`shutdown`) to mitigate rogue network access vectors or physical bypass attacks.
 
 ---
+## 📡 Enterprise Multi-SSID Wireless Infrastructure Matrix
 
+To align with your updated department mapping and extend role-based network containment across the mobility domain without deploying redundant physical hardware layers, the enterprise wireless architecture utilizes a single physical Wireless Access Point (WAP) array to broadcast three separate Service Set Identifiers (SSIDs). **Company PCs are strictly hardwired via Ethernet; Wi-Fi is reserved exclusively for smartphones and mobile endpoints.**
+
+*   **SSID:** `Corporate-Secure`
+    *   **Logical Network Bind:** VLAN 30 (IT / SOC / IAM Core), VLAN 10 (Finance), VLAN 15 (Executive Suite), and VLAN 20 (HR & Administration)
+    *   **Target Scope:** Automatically maps authorized internal corporate **smartphones** to their respective departments based on their identity profiles. 
+*   **SSID:** `Corporate-Guest`
+    *   **Logical Network Bind:** VLAN 40 (Guest Space Tier)
+    *   **Target Scope:** Provisioned exclusively for visitor smartphones and non-employee mobile infrastructure access.
+*   **SSID:** `Corporate-IoT`
+    *   **Logical Network Bind:** VLAN 50 (Hardened IoT & Surveillance Zone)
+    *   **Target Scope:** Isolates facility smart systems, building management controllers, and wireless CCTV cameras scattered across the property.
+
+---
 ## 🏢 Network Scenario & Addressing
 
 A corporate office requires an internal network restructure to secure its operational workflows. The environment hosts eight distinct subnets, each mapped to a specific corporate function and data tier. The security policy mandates granular boundary protections to prevent unauthorized internal communication, focusing heavily on lateral movement reduction.
