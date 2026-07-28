@@ -7,7 +7,27 @@ This project demonstrates the design and implementation of a segmented enterpris
 The network is divided into multiple departments using VLANs, with controlled communication enforced via Access Control Lists (ACLs). Inter-VLAN routing is configured using a Router-on-a-Stick approach, and dynamic IP addressing is provided through DHCP. This project reflects real-world Defense-in-Depth, least privilege, identity boundary alignment, and network segmentation strategies used in modern enterprise cybersecurity.
 
 ---
+## ⚙️ Core Skills Demonstrated
 
+- **VLAN Segmentation & Broadcast Domain Isolation:** Each individual department environment is provisioned within a distinct Layer 2 broadcast boundary. This effectively bounds broadcast storms, stabilizes network operations, and hardens the baseline data perimeter.
+
+- **Inter-VLAN Routing (Router-on-a-Stick):** Facilitates high-speed routing via localized subinterfaces using 802.1Q frame encapsulation on a single physical link, presenting a clear understanding of logical architecture overhead.
+
+- **Access Control Lists (ACLs) Traffic Policy Enforcement:** Employs Extended ACLs on layer 3 ingress processing points to drop malicious or unapproved connection parameters based on explicitly defined corporate rules.
+
+- **DHCP Scopes Configuration Automations:** Streamlines organizational architecture expansion and reduces user misconfigurations by writing adaptive multi-pool lease structures mapping internal DNS pathways to central identity servers.
+
+- **Role-Based Access Control (RBAC) Architecture:** Access parameters map entirely to business assignments (Finance, HR, IT, Guest), displaying a firm grasp of Identity Access Management alignment.
+- **OSI Model Mapping & Layered Traffic Flow:** Integrates end-to-end data encapsulation and decapsulation across the 7-tier model during enterprise transit—managing Layer 2 MAC addresses and 802.1Q trunking, Layer 3 IP subinterface routing and Extended ACL filtering, Layer 4 TCP connection state tracking for stateful firewalls, and Layer 7 deep packet inspection alongside DHCP D.O.R.A. handshakes.
+- 
+- **Network Troubleshooting & Asset Verification Diagnostic Tools:** Deep expertise navigating raw console utilities to isolate system issues and confirm defensive health:
+  - `ping` -> Evaluates link-layer response speeds and validates connectivity drops.
+  - `tracert` -> Charts intermediate hops to locate configuration flaws.
+  - `ipconfig` -> Audits client NIC settings to verify gateway and AD DNS configurations.
+  - `show vlan brief` -> Confirms physical access ports match defined configurations.
+  - `show access-lists` -> Displays policy tracking hit statistics.
+
+- **SOC Infrastructure Visibility & System Monitoring Mindset:** Architectural separation accounts for unified visibility mapping, incorporating dedicated Active Directory authentication monitoring and SOC log collection points to verify analytical tracking.
 
 ## 🏢 Architectural Realities: Physical vs. Logical Deployment
 
@@ -523,26 +543,7 @@ Router(config-subif)# exit
 | TC-06 | Unauthorized Tiers | Switch SVIs / OOBM Tiers | VTY Management Console | Blocked (OOBM Isolation Control) | ✅ Verified / Closed |
 | TC-07 | DMZ Public Servers | Core Enterprise Intranet | Internal Host Segments | Blocked (DMZ Containment Matrix) | ✅ Verified / Closed |
 
-## ⚙️ Core Skills Demonstrated
 
-- **VLAN Segmentation & Broadcast Domain Isolation:** Each individual department environment is provisioned within a distinct Layer 2 broadcast boundary. This effectively bounds broadcast storms, stabilizes network operations, and hardens the baseline data perimeter.
-
-- **Inter-VLAN Routing (Router-on-a-Stick):** Facilitates high-speed routing via localized subinterfaces using 802.1Q frame encapsulation on a single physical link, presenting a clear understanding of logical architecture overhead.
-
-- **Access Control Lists (ACLs) Traffic Policy Enforcement:** Employs Extended ACLs on layer 3 ingress processing points to drop malicious or unapproved connection parameters based on explicitly defined corporate rules.
-
-- **DHCP Scopes Configuration Automations:** Streamlines organizational architecture expansion and reduces user misconfigurations by writing adaptive multi-pool lease structures mapping internal DNS pathways to central identity servers.
-
-- **Role-Based Access Control (RBAC) Architecture:** Access parameters map entirely to business assignments (Finance, HR, IT, Guest), displaying a firm grasp of Identity Access Management alignment.
-
-- **Network Troubleshooting & Asset Verification Diagnostic Tools:** Deep expertise navigating raw console utilities to isolate system issues and confirm defensive health:
-  - `ping` -> Evaluates link-layer response speeds and validates connectivity drops.
-  - `tracert` -> Charts intermediate hops to locate configuration flaws.
-  - `ipconfig` -> Audits client NIC settings to verify gateway and AD DNS configurations.
-  - `show vlan brief` -> Confirms physical access ports match defined configurations.
-  - `show access-lists` -> Displays policy tracking hit statistics.
-
-- **SOC Infrastructure Visibility & System Monitoring Mindset:** Architectural separation accounts for unified visibility mapping, incorporating dedicated Active Directory authentication monitoring and SOC log collection points to verify analytical tracking.
 
 ## 🛡️ Advanced Engineering Defense Strategies
 
