@@ -49,6 +49,185 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
 
 ---
 
+## 🎛️ Physical Server Room & Rack Architecture Mapping
+
+The section below maps the logical topology directly onto physical corporate infrastructure units housed within the IT Operations room datacenter frame, visualizing the containment boundaries and edge endpoints:
+
+* **Edge Transit Tier:** The Core Router (2911) hosts the public WAN interface (`g0/1`: `203.0.113.2`) and terminates a hardware-accelerated `Tun0` secure IPsec VPN tunnel back to the Cape Town Remote Branch (`10.255.255.1`).
+* **Logical Trunking Aggregation:** A Layer 2/3 Core Switch distributes 802.1Q tagged configurations down through dedicated access links to physical server blades, utilizing an 802.1Q Trunk Link interface on `Fa0/6` to aggregate multi-SSID corporate wireless arrays (`Corporate-Secure`, `Corporate-Guest`, `Corporate-IoT`).
+* **Segregated Compute Zone Assets:**
+  * 🔴 **Finance Production Vault:** Hosts the Finance Server (`192.168.10.50`) and the centralized Finance File Share (`192.168.10.60`) handling general ledgers. Finance PCs are strictly hardwired; supports Finance staff smartphones via the Corporate-Secure mobility framework.
+  * 🔴 **Executive Suite Repository (Admin):** Hosts management communication assets for the CEO, COO, and CFO within VLAN 15. Executive PCs are strictly hardwired; supports C-level executive smartphones via the Corporate-Secure mobility framework.
+  * 🔵 **HR Administration Repository:** Hosts the HR Database Server (`192.168.20.50`) and the HR File Server (`192.168.20.60`) containing employee records. HR PCs are strictly hardwired; supports HR staff smartphones via the Corporate-Secure mobility framework.
+  * 🟢 **Core Directory & SOC Hub:** Hosts the Active Directory Domain Controller (`192.168.30.100`), Web Server (`192.168.30.50`), and the central Log / SIEM Server (`192.168.30.200`). Serves as the identity engine validating wireless enterprise client authentications anchored to the Corporate-Secure mobility framework. IT PCs are strictly hardwired.
+  * 🟡 **Guest Access & Mobility Gateway:** Anchored cleanly to VLAN 40 to completely drop unauthorized traffic before it leaves the rack plane. This handles both the physical field-drop interface and the local hardware Wireless Access Point (AP) broadcasting the `Corporate-Guest` SSID network framework for guest smartphones.
+  * 🟣 **IoT & Printer Infrastructure Anchor:** Houses high-risk network assets, managing static endpoints including the Corporate Multi-Function Printer (`192.168.50.20`) connected via physical switch port `Fa0/10` and Smart TV nodes (`192.168.50.30`) isolated via the Corporate-IoT SSID broadcast matrix.
+  * 🟤 **Out-of-Band Management (OOBM) Shield:** Enforces complete control plane isolation via VLAN 99, providing a dedicated interface infrastructure path restricted strictly to management operations.
+  * 🔒 **Hardened DMZ Production Segment:** Hosts public-facing corporate infrastructure elements within VLAN 100, isolated fully from trusted user tiers to terminate exterior requests safely.
+* **⚡ High-Availability Power Layer:** A dedicated, rack-mounted UPS (Uninterruptible Power Supply) backup system is installed at the framework foundation, ensuring continuous runtime, clean power conditioning, and operational resilience for the core security infrastructure during local power fluctuations or load-shedding events.
+* **Vulnerability Management Baseline Enforcement:** 100% of unused physical switch ports and interface slots are administratively shut down (`shutdown`) to mitigate rogue network access vectors or physical bypass attacks.
+
+---
+## 📡 Enterprise Multi-SSID Wireless Infrastructure Matrix
+
+To align with your updated department mapping and extend role-based network containment across the mobility domain without deploying redundant physical hardware layers, the enterprise wireless architecture utilizes a single physical Wireless Access Point (WAP) array to broadcast three separate Service Set Identifiers (SSIDs). **Company PCs are strictly hardwired via Ethernet; Wi-Fi is reserved exclusively for smartphones and mobile endpoints.**
+
+*   **SSID:** `Corporate-Secure`
+    *   **Logical Network Bind:** VLAN 30 (IT / SOC / IAM Core), VLAN 10 (Finance), VLAN 15 (Executive Suite), and VLAN 20 (HR & Administration)
+    *   **Target Scope:** Automatically maps authorized internal corporate **smartphones** to their respective departments based on their identity profiles. 
+*   **SSID:** `Corporate-Guest`
+    *   **Logical Network Bind:** VLAN 40 (Guest Space Tier)
+    *   **Target Scope:** Provisioned exclusively for visitor smartphones and non-employee mobile infrastructure access.
+*   **SSID:** `Corporate-IoT`
+    *   **Logical Network Bind:** VLAN 50 (Hardened IoT & Surveillance Zone)
+    *   **Target Scope:** Isolates facility smart systems, building management controllers, and wireless CCTV cameras scattered across the property.
+
+---
+## 🏢 Network Scenario & Addressing
+
+A corporate office requires an internal network restructure to secure its operational workflows. The environment hosts eight distinct subnets, each mapped to a specific corporate function and data tier. The security policy mandates granular boundary protections to prevent unauthorized internal communication, focusing heavily on lateral movement reduction.
+
+### VLAN & Access Policy Table
+
+| VLAN ID | Department | Gateway IP | Subnet Mask | Access Policy | Plain-English Explanation |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **VLAN 10** | Finance | `192.168.10.1` | `255.255.255.0` | Secure financial data & file storage access. | Financial operations must be heavily guarded. Restricts incoming untrusted corporate segments while allowing verified business traffic to touch servers and file shares. PCs are hardwired; runs on Corporate-Secure for smartphones. |
+| **VLAN 15** | Executive Suite | `192.168.15.1` | `255.255.255.0` | Full Server Access / Workstation Isolation. | Houses C-level executives (CEO, COO, CFO) on the 3rd floor. Granted explicit routing access to the Finance Server for strategic oversight, but logically isolated from local accounting endpoints. PCs are hardwired; runs on Corporate-Secure for smartphones. |
+| **VLAN 20** | HR & Administration | `192.168.20.1` | `255.255.255.0` | Access Finance, blocked from IT. | Handles general corporate administration, payroll, and benefits. Requires clear tracking lines to the central Finance Server and local HR File shares, but core IT infrastructure subnets remain off-limits. PCs are hardwired; runs on Corporate-Secure for smartphones. |
+| **VLAN 30** | IT / SOC / IAM | `192.168.30.1` | `255.255.255.0` | Full access (monitoring/privileged identity control). | IT maintains all production environments and manages the central Active Directory Domain Controller (`.100`) for IAM. Full visibility is required to troubleshoot, audit, and secure the network. PCs are hardwired; runs on Corporate-Secure for smartphones. |
+| **VLAN 40** | Guest Space | `192.168.40.1` | `255.255.255.0` | External access only (fully restricted). | Consultants, interns, and visitor smartphones via Corporate-Guest receive basic internet connectivity. They are entirely blind to internal company infrastructure to protect corporate intellectual property. |
+| **VLAN 50** | IoT & Printer Zone | `192.168.50.1` | `255.255.255.0` | Periphery Containment & Zero-Trust Print Spooling. | Traps unhardened smart infrastructure devices, Network Multi-Function Printers (MFPs), and facility CCTV networks via Corporate-IoT. Permitted to accept inbound print jobs and NVR traffic, but strictly blocked from initiating outbound connections. |
+| **VLAN 99** | Out-of-Band Mgmt | `192.168.99.1` | `255.255.255.0` | Infrastructure Shield. | OOBM Layer: Isolates network management control elements and Switch SVIs. Completely blocks non-admin segments from interacting with administrative infrastructure. |
+| **VLAN 100** | Secure Server Farm | `192.168.100.1` | `255.255.255.0` | DMZ Data Tier Isolation. | DMZ Layer: Moves critical production application servers out of standard client domains into a dedicated, hardened repository zone. |
+
+---
+
+## 🖥️ Centralized Infrastructure Layout
+
+To maximize enterprise accuracy, our datacenter zone maps dedicated functional systems to mirror real production environments:
+* **Active Directory Domain Controller (AD-DC):** `192.168.30.100` (VLAN 30) – Enforces enterprise Identity and Access Management (IAM), kerberos ticket verification, and central workstation user policies.
+* **Finance Production Server:** `192.168.10.50` (VLAN 10) – Hosts core ledger, invoice processing, and financial accounting applications.
+* **Finance File Share Server:** `192.168.10.60` (VLAN 10) – Secure localized repository hosting department financial records and spreadsheets.
+* **HR Server:** `192.168.20.50` (VLAN 20) – Stores administrative records and employee management databases.
+* **HR Department File Server:** `192.168.20.60` (VLAN 20) – Houses internal contracts, onboarding templates, and benefit records.
+* **Web Server:** `192.168.30.50` (VLAN 30) – Disseminates internal corporate tools and internal web applications.
+* **Logging / SOC SIEM Server:** `192.168.30.200` (VLAN 30) – Collects system logs and monitors simulated device telemetry.
+* **Network Multi-Function Printer (MFP):** `192.168.50.20` (VLAN 50) – Static network printer device handling corporate print queues under rigid outbound communication containment.
+* **Physical CCTV Network Video Recorder (NVR):** `192.168.50.25` (VLAN 50) – Secure internal node managing surveillance feeds mapped strictly within the IoT architecture.
+* **DMZ Core Application Server:** `192.168.100.10` (VLAN 100) – Runs public web application components under stateful perimeter supervision.
+* **DMZ Corporate Mail Server:** `192.168.100.20` (VLAN 100) – Directs inbound/outbound external corporate mail routing.
+* **DMZ Public Web Server:** `192.168.100.30` (VLAN 100) – Hosts the primary external storefront and corporate web assets.
+* **DMZ Hardened SFTP Server:** `192.168.100.40` (VLAN 100) – Validates encrypted external client file transfers.
+---
+
+🔄 The Automated Handshake: How Devices Get an IP (D.O.R.A.)
+
+When an unconfigured asset attaches to an access port or logs into a wireless SSID broadcast, it initiates a native 4-stage broadcast handshake sequence with the automated infrastructure engine on the 2911 router:
+
+- **Discover (Client Broadcast):** The unprovisioned endpoint floods the layer 2 domain seeking an identity: *"Is there an authoritative address coordinator available? I require parameters."*
+
+- **Offer (Router Unicast/Broadcast):** The 2911 intercepts the frame via its designated subinterface (e.g., g0/0.10), references the active pool tracking data, and proposes parameters: *"Acknowledged. I manage the 192.168.10.0/24 zone. Here is an available target lease."*
+
+- **Request (Client Broadcast):** The endpoint locks down the proposed parameters across the domain: *"Confirmed. I formally request a lease assignment on this specific allocation."*
+
+- **Acknowledge (Router Unicast/Broadcast):** The router completes the transaction, logging the device's physical MAC footprint inside its active state table: *"Transaction locked. Your configuration lease is active; default gateways, parameters, and central Active Directory DNS mappings are pushed."*
+
+
+---
+## 🎯 Perimeter vs. Internal Boundary Separation
+
+With the physical network topology upgraded to include an edge security appliance labeled NGFW, the network implements a clear defense-in-depth model:
+* **Active Internal Enforcement (Cisco Router ACLs):** All inter-VLAN, role-based blocking rules (East-West traffic) are configured on the 2911 Edge Router via Extended Access Control Lists applied explicitly to logical subinterfaces. This ensures local containment so unprivileged internal subnets cannot reach restricted databases, identity directories, or backend storage segments.
+* **Perimeter Inspection Layer (NGFW Hardware Placement):** The dedicated edge security appliance is structurally placed at the true internet boundary. This layer is strategically positioned to handle high-compute Layer 7 protection (Application Control, URL Threat Intelligence, and Intrusion Prevention) for all traffic exiting the internal corporate subnets out to the wide-area network (North-South traffic).
+
+---
+## 🛡️ Firewall & Perimeter Defense Layer
+
+* **Stateful Inspection vs. Stateless ACLs:** Unlike standard stateless ACL router controls that filter blindly on individual packet headers, the perimeter firewall enforces stateful inspection policies. It tracks active TCP connection handshakes originating from high-privilege corporate workstations (Exec Suites, Finance) out toward external web entities, ensuring returning traffic is strictly validated and linked to a verified, established internal session.
+* **Application-Layer Visibility (Layer 7 Defense):** The perimeter layer leverages deep packet inspection (DPI) to stop protocol-abuse attacks. If an asset inside the Executive Suite or HR network attempts to tunnel unapproved traffic or run malicious software over standard web ports (such as masking data exfiltration over Port 80 or 443), the firewall's application identification capabilities flag and neutralize the session immediately.
+* **Integrated Intrusion Prevention Systems (IPS):** The firewall runs dynamic signature matching engines to detect active exploitation attempts, software vulnerabilities, or network-layer scanning sequences targeting the internal corporate environment, generating telemetry drops directly to the security operations center (SOC) log collector.
+
+---
+
+## 🧪 Verification & Testing Validation
+
+### Automated Test Cases Matrix
+
+| Test Case ID | Traffic Source Host | Destination Target | Target Resource / Port | Expected Behavior | Verification Status |
+|---|---|---|---|---|---|
+| TC-01a | Guest Kiosk PC (Wired) | Finance / Admin PC | ICMP Echo Request (ping) | Blocked (Implicit Drop) | ✅ Verified / Closed |
+| TC-01b | Guest SmartPhone (Wi-Fi) | Finance Server Host | HTTP / Port 80, 443 | Blocked (ACL Boundary) | ✅ Verified / Closed |
+| TC-02 | Admin Endpoint (192.168.15.X) | Finance Database Server | Host IP (192.168.10.50) | ALLOWED (Shared Executive Access) | ✅ Verified / Closed |
+| TC-03 | HR Professional (192.168.20.X) | HR Department File Server | Host IP (192.168.20.60) | Allowed (Localized Access) | ✅ Verified / Closed |
+| TC-04 | Security / IT Admin (192.168.30.X) | Active Directory Server | Host IP (192.168.30.100) | Allowed (IAM Direct Control) | ✅ Verified / Closed |
+| TC-05 | Network MFP Printer (IoT On Fa0/10) | Internal Subnets (192.168.X.X) | Outbound System Pivot | Blocked (IoT Quarantine Rule) | ✅ Verified / Closed |
+| TC-06 | Unauthorized Tiers | Switch SVIs / OOBM Tiers | VTY Management Console | Blocked (OOBM Isolation Control) | ✅ Verified / Closed |
+| TC-07 | DMZ Public Servers | Core Enterprise Intranet | Internal Host Segments | Blocked (DMZ Containment Matrix) | ✅ Verified / Closed |
+
+
+
+## 🛡️ Advanced Engineering Defense Strategies
+
+- **Lateral Movement & Containment Architecture:** By establishing strict micro-segmentation boundaries between networks, any potential security incident—such as a malware execution or a ransomware outbreak—is contained entirely within its source broadcast domain. If a threat actor establishes an entry point foothold on a computer in the Guest zone or compromises an unhardened Multi-Function Printer in the IoT zone, your Extended ACL blocks the attack at the default gateway interface processing point, preventing lateral exploration across internal corporate storage vaults or identity databases.
+
+- **The Ransomware Blast Radius Simulation:** This architecture provides a documented engineering control against network-wide compromises. If an untrusted endpoint triggers a malicious payload, the core storage file shares (Finance/HR FileServers), identity nodes (Active Directory DC), and the underlying centralized log environments (Logging_Server) remain 100% clean and isolated. The attack plane is successfully bounded, minimizing remediation overhead and allowing security operations analysts to preserve evidence securely.
+
+- **Proposed Future GNS3 Framework Scalability:** While this Packet Tracer deployment perfectly validates the mathematical logic, addressing pools, and core traffic engineering choices, real-world scaling can be migrated into a GNS3 hypervisor cluster for advanced engineering evaluations. Moving this layout to GNS3 later allows a security engineer to replace logical router abstractions with true hardware kernel appliances (such as Cisco IOSv QEMU binaries and production-grade FortiGate stateful firewall operating systems). That evolution allows analysts to test real-world deep packet inspection (DPI), stateful tracking metrics, and raw syslog ingestion streams passing directly out of live Windows Server 2022 Core Domain Controller VMs and into live dockerized SIEM monitoring nodes (Elastic / Wazuh), elevating this network simulation into a real-world, high-fidelity security staging lab.
+
+- **Layer 2 Physical Port-Security Hardening:** Mitigates unauthorized physical site infiltration or rogue asset drops using local switch interface parameters to shutdown unassigned empty wall jacks instantly:
+
+```text
+Switch(config)# interface range FastEthernet0/13 - 23
+Switch(config-if-range)# switchport port-security
+Switch(config-if-range)# switchport port-security maximum 1
+Switch(config-if-range)# switchport port-security violation shutdown
+```
+
+## 🔐 Security Implementation Summary
+
+The network configuration transitions the operational footprint from a high-risk, flat architecture into a secure, hardened baseline. By embedding strict division strategies directly inside core switches and filtering transit layers via the Edge router, lateral pivoting threats are significantly minimized. Guests, peripheral IoT systems, and network printers remain fully siloed from core Active Directory identity directories and department file shares, preventing unauthorized privilege escalation and ensuring robust infrastructure defense.
+
+## 📊 Results Summary
+
+- **Logical Boundary Operations:** 100% of defined department entities populate as isolated, named VLAN segments on the L2 control frame switch.
+
+- **DHCP Lease Automation Reliability:** Network endpoints dynamically generate validated network addresses coinciding with their respective department pools and DNS pathways upon activation.
+
+- **Policy Rule Accuracy Enforcement:** Granular access lists process every transit transaction accurately, matching explicitly defined rules to block unapproved access paths while permitting standard business functions.
+
+- **End-to-End Environment Performance:** Zero latency impact observed during authorized inter-VLAN communication pathways.
+
+## 🧾 Conclusion
+
+This advanced lab project moves far beyond entry-level infrastructure concepts, directly addressing complex corporate enterprise engineering challenges. By integrating network segmentation, dynamic identity automation, and traffic filtering policies into a unified architecture, this project demonstrates hands-on technical proficiency. It bridges the gap between raw hardware connectivity and active network security orchestration, establishing a robust foundation for building resilient enterprise environments.
+
+## 🏆 Career Relevance Mapping
+
+- 🔐 **SOC Analyst:** Deep knowledge analyzing complex device traffic logs, mapping unexpected connection drops, and differentiating between router-based stateless packet filters and firewall stateful session tracking to contain lateral network movement during active incident response containment phases.
+
+- 👤 **IAM Analyst:** Direct configuration modeling of Role-Based Access Controls (RBAC), data flow permissions matrixes, and Active Directory identity mapping at the network layer, reinforcing the core security principles of Least Privilege.
+
+- 🛡️ **Vulnerability Management:** Structural validation of network-level boundary mechanics, allowing security analysts to dramatically shrink an enterprise's threat landscape by quarantining high-risk printer/IoT nodes and enforcing Layer 7 application control at the perimeter.
+
+- 🛠️ **IT Infrastructure Support:** Practical mastery deploying corporate-grade switches and routing systems, managing automated lease pools, and performing line-rate diagnostic troubleshooting.
+
+## 🏁 Project Status
+
+- **Lab State:** ✅ COMPLETED
+- **Testing Coverage:** ✅ 100% SUCCESSFUL PASSED
+- **Policy Verification:** ✅ VALIDATED & LOCKED
+
+## 🔖 Project Hashtags
+
+#CyberSecurity #SOC #IAM #Networking #VLAN #ACL #CiscoPacketTracer #ITSecurity #EthicalHacking #NetworkSecurity #VulnerabilityManagement #PortfolioProject #EnterpriseNetwork #Subnetting #ActiveDirectory #IdentityManagement #PrintSecurity
+
+
+---
+
+## APPENDIX: FULL CISCO DEVICE & SERVICE CONFIGURATIONS
+
+#### 1. SWITCH CONFIGURATION (VLANs & Access Ports)
+
 ## 🗺️ Logical Architecture Blueprint
 
 ```text
@@ -148,192 +327,6 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
 ```
 
 
-## 🎯 Perimeter vs. Internal Boundary Separation
-
-With the physical network topology upgraded to include an edge security appliance labeled NGFW, the network implements a clear defense-in-depth model:
-* **Active Internal Enforcement (Cisco Router ACLs):** All inter-VLAN, role-based blocking rules (East-West traffic) are configured on the 2911 Edge Router via Extended Access Control Lists applied explicitly to logical subinterfaces. This ensures local containment so unprivileged internal subnets cannot reach restricted databases, identity directories, or backend storage segments.
-* **Perimeter Inspection Layer (NGFW Hardware Placement):** The dedicated edge security appliance is structurally placed at the true internet boundary. This layer is strategically positioned to handle high-compute Layer 7 protection (Application Control, URL Threat Intelligence, and Intrusion Prevention) for all traffic exiting the internal corporate subnets out to the wide-area network (North-South traffic).
-
----
-
-## 🎛️ Physical Server Room & Rack Architecture Mapping
-
-The section below maps the logical topology directly onto physical corporate infrastructure units housed within the IT Operations room datacenter frame, visualizing the containment boundaries and edge endpoints:
-
-* **Edge Transit Tier:** The Core Router (2911) hosts the public WAN interface (`g0/1`: `203.0.113.2`) and terminates a hardware-accelerated `Tun0` secure IPsec VPN tunnel back to the Cape Town Remote Branch (`10.255.255.1`).
-* **Logical Trunking Aggregation:** A Layer 2/3 Core Switch distributes 802.1Q tagged configurations down through dedicated access links to physical server blades, utilizing an 802.1Q Trunk Link interface on `Fa0/6` to aggregate multi-SSID corporate wireless arrays (`Corporate-Secure`, `Corporate-Guest`, `Corporate-IoT`).
-* **Segregated Compute Zone Assets:**
-  * 🔴 **Finance Production Vault:** Hosts the Finance Server (`192.168.10.50`) and the centralized Finance File Share (`192.168.10.60`) handling general ledgers. Finance PCs are strictly hardwired; supports Finance staff smartphones via the Corporate-Secure mobility framework.
-  * 🔴 **Executive Suite Repository (Admin):** Hosts management communication assets for the CEO, COO, and CFO within VLAN 15. Executive PCs are strictly hardwired; supports C-level executive smartphones via the Corporate-Secure mobility framework.
-  * 🔵 **HR Administration Repository:** Hosts the HR Database Server (`192.168.20.50`) and the HR File Server (`192.168.20.60`) containing employee records. HR PCs are strictly hardwired; supports HR staff smartphones via the Corporate-Secure mobility framework.
-  * 🟢 **Core Directory & SOC Hub:** Hosts the Active Directory Domain Controller (`192.168.30.100`), Web Server (`192.168.30.50`), and the central Log / SIEM Server (`192.168.30.200`). Serves as the identity engine validating wireless enterprise client authentications anchored to the Corporate-Secure mobility framework. IT PCs are strictly hardwired.
-  * 🟡 **Guest Access & Mobility Gateway:** Anchored cleanly to VLAN 40 to completely drop unauthorized traffic before it leaves the rack plane. This handles both the physical field-drop interface and the local hardware Wireless Access Point (AP) broadcasting the `Corporate-Guest` SSID network framework for guest smartphones.
-  * 🟣 **IoT & Printer Infrastructure Anchor:** Houses high-risk network assets, managing static endpoints including the Corporate Multi-Function Printer (`192.168.50.20`) connected via physical switch port `Fa0/10` and Smart TV nodes (`192.168.50.30`) isolated via the Corporate-IoT SSID broadcast matrix.
-  * 🟤 **Out-of-Band Management (OOBM) Shield:** Enforces complete control plane isolation via VLAN 99, providing a dedicated interface infrastructure path restricted strictly to management operations.
-  * 🔒 **Hardened DMZ Production Segment:** Hosts public-facing corporate infrastructure elements within VLAN 100, isolated fully from trusted user tiers to terminate exterior requests safely.
-* **⚡ High-Availability Power Layer:** A dedicated, rack-mounted UPS (Uninterruptible Power Supply) backup system is installed at the framework foundation, ensuring continuous runtime, clean power conditioning, and operational resilience for the core security infrastructure during local power fluctuations or load-shedding events.
-* **Vulnerability Management Baseline Enforcement:** 100% of unused physical switch ports and interface slots are administratively shut down (`shutdown`) to mitigate rogue network access vectors or physical bypass attacks.
-
----
-## 📡 Enterprise Multi-SSID Wireless Infrastructure Matrix
-
-To align with your updated department mapping and extend role-based network containment across the mobility domain without deploying redundant physical hardware layers, the enterprise wireless architecture utilizes a single physical Wireless Access Point (WAP) array to broadcast three separate Service Set Identifiers (SSIDs). **Company PCs are strictly hardwired via Ethernet; Wi-Fi is reserved exclusively for smartphones and mobile endpoints.**
-
-*   **SSID:** `Corporate-Secure`
-    *   **Logical Network Bind:** VLAN 30 (IT / SOC / IAM Core), VLAN 10 (Finance), VLAN 15 (Executive Suite), and VLAN 20 (HR & Administration)
-    *   **Target Scope:** Automatically maps authorized internal corporate **smartphones** to their respective departments based on their identity profiles. 
-*   **SSID:** `Corporate-Guest`
-    *   **Logical Network Bind:** VLAN 40 (Guest Space Tier)
-    *   **Target Scope:** Provisioned exclusively for visitor smartphones and non-employee mobile infrastructure access.
-*   **SSID:** `Corporate-IoT`
-    *   **Logical Network Bind:** VLAN 50 (Hardened IoT & Surveillance Zone)
-    *   **Target Scope:** Isolates facility smart systems, building management controllers, and wireless CCTV cameras scattered across the property.
-
----
-## 🏢 Network Scenario & Addressing
-
-A corporate office requires an internal network restructure to secure its operational workflows. The environment hosts eight distinct subnets, each mapped to a specific corporate function and data tier. The security policy mandates granular boundary protections to prevent unauthorized internal communication, focusing heavily on lateral movement reduction.
-
-### VLAN & Access Policy Table
-
-| VLAN ID | Department | Gateway IP | Subnet Mask | Access Policy | Plain-English Explanation |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **VLAN 10** | Finance | `192.168.10.1` | `255.255.255.0` | Secure financial data & file storage access. | Financial operations must be heavily guarded. Restricts incoming untrusted corporate segments while allowing verified business traffic to touch servers and file shares. PCs are hardwired; runs on Corporate-Secure for smartphones. |
-| **VLAN 15** | Executive Suite | `192.168.15.1` | `255.255.255.0` | Full Server Access / Workstation Isolation. | Houses C-level executives (CEO, COO, CFO) on the 3rd floor. Granted explicit routing access to the Finance Server for strategic oversight, but logically isolated from local accounting endpoints. PCs are hardwired; runs on Corporate-Secure for smartphones. |
-| **VLAN 20** | HR & Administration | `192.168.20.1` | `255.255.255.0` | Access Finance, blocked from IT. | Handles general corporate administration, payroll, and benefits. Requires clear tracking lines to the central Finance Server and local HR File shares, but core IT infrastructure subnets remain off-limits. PCs are hardwired; runs on Corporate-Secure for smartphones. |
-| **VLAN 30** | IT / SOC / IAM | `192.168.30.1` | `255.255.255.0` | Full access (monitoring/privileged identity control). | IT maintains all production environments and manages the central Active Directory Domain Controller (`.100`) for IAM. Full visibility is required to troubleshoot, audit, and secure the network. PCs are hardwired; runs on Corporate-Secure for smartphones. |
-| **VLAN 40** | Guest Space | `192.168.40.1` | `255.255.255.0` | External access only (fully restricted). | Consultants, interns, and visitor smartphones via Corporate-Guest receive basic internet connectivity. They are entirely blind to internal company infrastructure to protect corporate intellectual property. |
-| **VLAN 50** | IoT & Printer Zone | `192.168.50.1` | `255.255.255.0` | Periphery Containment & Zero-Trust Print Spooling. | Traps unhardened smart infrastructure devices, Network Multi-Function Printers (MFPs), and facility CCTV networks via Corporate-IoT. Permitted to accept inbound print jobs and NVR traffic, but strictly blocked from initiating outbound connections. |
-| **VLAN 99** | Out-of-Band Mgmt | `192.168.99.1` | `255.255.255.0` | Infrastructure Shield. | OOBM Layer: Isolates network management control elements and Switch SVIs. Completely blocks non-admin segments from interacting with administrative infrastructure. |
-| **VLAN 100** | Secure Server Farm | `192.168.100.1` | `255.255.255.0` | DMZ Data Tier Isolation. | DMZ Layer: Moves critical production application servers out of standard client domains into a dedicated, hardened repository zone. |
-
----
-
-## 🖥️ Centralized Infrastructure Layout
-
-To maximize enterprise accuracy, our datacenter zone maps dedicated functional systems to mirror real production environments:
-* **Active Directory Domain Controller (AD-DC):** `192.168.30.100` (VLAN 30) – Enforces enterprise Identity and Access Management (IAM), kerberos ticket verification, and central workstation user policies.
-* **Finance Production Server:** `192.168.10.50` (VLAN 10) – Hosts core ledger, invoice processing, and financial accounting applications.
-* **Finance File Share Server:** `192.168.10.60` (VLAN 10) – Secure localized repository hosting department financial records and spreadsheets.
-* **HR Server:** `192.168.20.50` (VLAN 20) – Stores administrative records and employee management databases.
-* **HR Department File Server:** `192.168.20.60` (VLAN 20) – Houses internal contracts, onboarding templates, and benefit records.
-* **Web Server:** `192.168.30.50` (VLAN 30) – Disseminates internal corporate tools and internal web applications.
-* **Logging / SOC SIEM Server:** `192.168.30.200` (VLAN 30) – Collects system logs and monitors simulated device telemetry.
-* **Network Multi-Function Printer (MFP):** `192.168.50.20` (VLAN 50) – Static network printer device handling corporate print queues under rigid outbound communication containment.
-* **Physical CCTV Network Video Recorder (NVR):** `192.168.50.25` (VLAN 50) – Secure internal node managing surveillance feeds mapped strictly within the IoT architecture.
-* **DMZ Core Application Server:** `192.168.100.10` (VLAN 100) – Runs public web application components under stateful perimeter supervision.
-* **DMZ Corporate Mail Server:** `192.168.100.20` (VLAN 100) – Directs inbound/outbound external corporate mail routing.
-* **DMZ Public Web Server:** `192.168.100.30` (VLAN 100) – Hosts the primary external storefront and corporate web assets.
-* **DMZ Hardened SFTP Server:** `192.168.100.40` (VLAN 100) – Validates encrypted external client file transfers.
-
----
-
-## 🛡️ Firewall & Perimeter Defense Layer
-
-* **Stateful Inspection vs. Stateless ACLs:** Unlike standard stateless ACL router controls that filter blindly on individual packet headers, the perimeter firewall enforces stateful inspection policies. It tracks active TCP connection handshakes originating from high-privilege corporate workstations (Exec Suites, Finance) out toward external web entities, ensuring returning traffic is strictly validated and linked to a verified, established internal session.
-* **Application-Layer Visibility (Layer 7 Defense):** The perimeter layer leverages deep packet inspection (DPI) to stop protocol-abuse attacks. If an asset inside the Executive Suite or HR network attempts to tunnel unapproved traffic or run malicious software over standard web ports (such as masking data exfiltration over Port 80 or 443), the firewall's application identification capabilities flag and neutralize the session immediately.
-* **Integrated Intrusion Prevention Systems (IPS):** The firewall runs dynamic signature matching engines to detect active exploitation attempts, software vulnerabilities, or network-layer scanning sequences targeting the internal corporate environment, generating telemetry drops directly to the security operations center (SOC) log collector.
-
----
-
-
-
-
-
-🔄 The Automated Handshake: How Devices Get an IP (D.O.R.A.)
-
-When an unconfigured asset attaches to an access port or logs into a wireless SSID broadcast, it initiates a native 4-stage broadcast handshake sequence with the automated infrastructure engine on the 2911 router:
-
-- **Discover (Client Broadcast):** The unprovisioned endpoint floods the layer 2 domain seeking an identity: *"Is there an authoritative address coordinator available? I require parameters."*
-
-- **Offer (Router Unicast/Broadcast):** The 2911 intercepts the frame via its designated subinterface (e.g., g0/0.10), references the active pool tracking data, and proposes parameters: *"Acknowledged. I manage the 192.168.10.0/24 zone. Here is an available target lease."*
-
-- **Request (Client Broadcast):** The endpoint locks down the proposed parameters across the domain: *"Confirmed. I formally request a lease assignment on this specific allocation."*
-
-- **Acknowledge (Router Unicast/Broadcast):** The router completes the transaction, logging the device's physical MAC footprint inside its active state table: *"Transaction locked. Your configuration lease is active; default gateways, parameters, and central Active Directory DNS mappings are pushed."*
-
----
-
-
-
-## 🧪 Verification & Testing Validation
-
-### Automated Test Cases Matrix
-
-| Test Case ID | Traffic Source Host | Destination Target | Target Resource / Port | Expected Behavior | Verification Status |
-|---|---|---|---|---|---|
-| TC-01a | Guest Kiosk PC (Wired) | Finance / Admin PC | ICMP Echo Request (ping) | Blocked (Implicit Drop) | ✅ Verified / Closed |
-| TC-01b | Guest SmartPhone (Wi-Fi) | Finance Server Host | HTTP / Port 80, 443 | Blocked (ACL Boundary) | ✅ Verified / Closed |
-| TC-02 | Admin Endpoint (192.168.15.X) | Finance Database Server | Host IP (192.168.10.50) | ALLOWED (Shared Executive Access) | ✅ Verified / Closed |
-| TC-03 | HR Professional (192.168.20.X) | HR Department File Server | Host IP (192.168.20.60) | Allowed (Localized Access) | ✅ Verified / Closed |
-| TC-04 | Security / IT Admin (192.168.30.X) | Active Directory Server | Host IP (192.168.30.100) | Allowed (IAM Direct Control) | ✅ Verified / Closed |
-| TC-05 | Network MFP Printer (IoT On Fa0/10) | Internal Subnets (192.168.X.X) | Outbound System Pivot | Blocked (IoT Quarantine Rule) | ✅ Verified / Closed |
-| TC-06 | Unauthorized Tiers | Switch SVIs / OOBM Tiers | VTY Management Console | Blocked (OOBM Isolation Control) | ✅ Verified / Closed |
-| TC-07 | DMZ Public Servers | Core Enterprise Intranet | Internal Host Segments | Blocked (DMZ Containment Matrix) | ✅ Verified / Closed |
-
-
-
-## 🛡️ Advanced Engineering Defense Strategies
-
-- **Lateral Movement & Containment Architecture:** By establishing strict micro-segmentation boundaries between networks, any potential security incident—such as a malware execution or a ransomware outbreak—is contained entirely within its source broadcast domain. If a threat actor establishes an entry point foothold on a computer in the Guest zone or compromises an unhardened Multi-Function Printer in the IoT zone, your Extended ACL blocks the attack at the default gateway interface processing point, preventing lateral exploration across internal corporate storage vaults or identity databases.
-
-- **The Ransomware Blast Radius Simulation:** This architecture provides a documented engineering control against network-wide compromises. If an untrusted endpoint triggers a malicious payload, the core storage file shares (Finance/HR FileServers), identity nodes (Active Directory DC), and the underlying centralized log environments (Logging_Server) remain 100% clean and isolated. The attack plane is successfully bounded, minimizing remediation overhead and allowing security operations analysts to preserve evidence securely.
-
-- **Proposed Future GNS3 Framework Scalability:** While this Packet Tracer deployment perfectly validates the mathematical logic, addressing pools, and core traffic engineering choices, real-world scaling can be migrated into a GNS3 hypervisor cluster for advanced engineering evaluations. Moving this layout to GNS3 later allows a security engineer to replace logical router abstractions with true hardware kernel appliances (such as Cisco IOSv QEMU binaries and production-grade FortiGate stateful firewall operating systems). That evolution allows analysts to test real-world deep packet inspection (DPI), stateful tracking metrics, and raw syslog ingestion streams passing directly out of live Windows Server 2022 Core Domain Controller VMs and into live dockerized SIEM monitoring nodes (Elastic / Wazuh), elevating this network simulation into a real-world, high-fidelity security staging lab.
-
-- **Layer 2 Physical Port-Security Hardening:** Mitigates unauthorized physical site infiltration or rogue asset drops using local switch interface parameters to shutdown unassigned empty wall jacks instantly:
-
-```text
-Switch(config)# interface range FastEthernet0/13 - 23
-Switch(config-if-range)# switchport port-security
-Switch(config-if-range)# switchport port-security maximum 1
-Switch(config-if-range)# switchport port-security violation shutdown
-```
-
-## 🔐 Security Implementation Summary
-
-The network configuration transitions the operational footprint from a high-risk, flat architecture into a secure, hardened baseline. By embedding strict division strategies directly inside core switches and filtering transit layers via the Edge router, lateral pivoting threats are significantly minimized. Guests, peripheral IoT systems, and network printers remain fully siloed from core Active Directory identity directories and department file shares, preventing unauthorized privilege escalation and ensuring robust infrastructure defense.
-
-## 📊 Results Summary
-
-- **Logical Boundary Operations:** 100% of defined department entities populate as isolated, named VLAN segments on the L2 control frame switch.
-
-- **DHCP Lease Automation Reliability:** Network endpoints dynamically generate validated network addresses coinciding with their respective department pools and DNS pathways upon activation.
-
-- **Policy Rule Accuracy Enforcement:** Granular access lists process every transit transaction accurately, matching explicitly defined rules to block unapproved access paths while permitting standard business functions.
-
-- **End-to-End Environment Performance:** Zero latency impact observed during authorized inter-VLAN communication pathways.
-
-## 🧾 Conclusion
-
-This advanced lab project moves far beyond entry-level infrastructure concepts, directly addressing complex corporate enterprise engineering challenges. By integrating network segmentation, dynamic identity automation, and traffic filtering policies into a unified architecture, this project demonstrates hands-on technical proficiency. It bridges the gap between raw hardware connectivity and active network security orchestration, establishing a robust foundation for building resilient enterprise environments.
-
-## 🏆 Career Relevance Mapping
-
-- 🔐 **SOC Analyst:** Deep knowledge analyzing complex device traffic logs, mapping unexpected connection drops, and differentiating between router-based stateless packet filters and firewall stateful session tracking to contain lateral network movement during active incident response containment phases.
-
-- 👤 **IAM Analyst:** Direct configuration modeling of Role-Based Access Controls (RBAC), data flow permissions matrixes, and Active Directory identity mapping at the network layer, reinforcing the core security principles of Least Privilege.
-
-- 🛡️ **Vulnerability Management:** Structural validation of network-level boundary mechanics, allowing security analysts to dramatically shrink an enterprise's threat landscape by quarantining high-risk printer/IoT nodes and enforcing Layer 7 application control at the perimeter.
-
-- 🛠️ **IT Infrastructure Support:** Practical mastery deploying corporate-grade switches and routing systems, managing automated lease pools, and performing line-rate diagnostic troubleshooting.
-
-## 🏁 Project Status
-
-- **Lab State:** ✅ COMPLETED
-- **Testing Coverage:** ✅ 100% SUCCESSFUL PASSED
-- **Policy Verification:** ✅ VALIDATED & LOCKED
-
-## 🔖 Project Hashtags
-
-#CyberSecurity #SOC #IAM #Networking #VLAN #ACL #CiscoPacketTracer #ITSecurity #EthicalHacking #NetworkSecurity #VulnerabilityManagement #PortfolioProject #EnterpriseNetwork #Subnetting #ActiveDirectory #IdentityManagement #PrintSecurity
-
-
----
-
-## APPENDIX: FULL CISCO DEVICE & SERVICE CONFIGURATIONS
-
-#### 1. SWITCH CONFIGURATION (VLANs & Access Ports)
 
 ## ⚙️ Step-by-Step Configuration Guide
 
