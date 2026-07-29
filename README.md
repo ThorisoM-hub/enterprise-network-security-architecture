@@ -19,7 +19,6 @@ The network is divided into multiple departments using VLANs, with controlled co
 
 - **Role-Based Access Control (RBAC) Architecture:** Access parameters map entirely to business assignments (Finance, HR, IT, Guest), displaying a firm grasp of Identity Access Management alignment.
 - **OSI Model Mapping & Layered Traffic Flow:** Integrates end-to-end data encapsulation and decapsulation across the 7-tier model during enterprise transit—managing Layer 2 MAC addresses and 802.1Q trunking, Layer 3 IP subinterface routing and Extended ACL filtering, Layer 4 TCP connection state tracking for stateful firewalls, and Layer 7 deep packet inspection alongside DHCP D.O.R.A. handshakes.
-- 
 - **Network Troubleshooting & Asset Verification Diagnostic Tools:** Deep expertise navigating raw console utilities to isolate system issues and confirm defensive health:
   - `ping` -> Evaluates link-layer response speeds and validates connectivity drops.
   - `tracert` -> Charts intermediate hops to locate configuration flaws.
@@ -53,53 +52,54 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
 ## 🗺️ Logical Architecture Blueprint
 
 ```text
-                                     [ The Internet / WAN Cloud ]
-                                                  |
-                                     [ Next-Gen Firewall (NGFW) ]
-                                     (Perimeter Stateful Defense)
-                                                  |
-                                 [ Edge Router / Firewall (2911) ]
-                                                |
-                                                | g0/0 (802.1Q Trunk Link)
-                                                |
-                                      [ Core Switch (2960) ]
-              __________________________________|__________________________________
-             |                                  |                                  |
-        [ Trunk / VTP ]                      [ Fa0/3 ]                          [ Fa0/4 ]
-             |                                  |                                  |
- ==========🔴 THE RED ZONE ==========   ===============🔵 BLUE ZONE ============ ============🟢 GREEN ZONE ============
- |  (High-Privilege Security Policy) |   |  VLAN 20: HR & Administration   | |  VLAN 30: IT / SOC / IAM        |
- |                                   |   |  Subnet: 192.168.20.0/24        | |  Subnet: 192.168.30.0/24        |
- |  Executive Suite [3rd Floor]      |   |                                 | |                                 |
- |  VLAN 15                          |   |  [HR_PC]         [HR_Server]    | |  [IT_PC]        [AD_DomainCtrl] |
- |  Subnet: 192.168.15.0/24          |   |  (Wired Ethernet)(192.168.20.50)| |  (Wired Ethernet)(192.168.30.100)|
- |  - CEO/COO/CFO PCs (Wired)        |   |                                 | |                                 |
- |  - Exec Smartphones (Wi-Fi)       |   |  [HR_Phone]      [HR_FileServer]| |  [IT_Phone]     [Log_Server]    |
- |        \                          |   |  (Wi-Fi)         (192.168.20.60)| |  (Wi-Fi)        (192.168.30.200)|
- |         \                         |   |        |                ^       | |        |                ^       |
- |          v                        |   |        v                |       | |        v                |       |
- |  Finance [2nd Floor: Finance Dept]|   (Allowed) --------->      |       | |    (Allowed) ---------> |       |
- |  VLAN 10                          |   =================================== |                     |       |
- |  Subnet: 192.168.10.0/24          |            |                ^         |                     |       |
- |  - [Finance_PC] (Wired Ethernet)  |            |                |         ===================================
- |  - [Fin_Phone] (Wi-Fi Smartphone) |            |                X (Blocked via ACL)                 ^
- |  - [Fin_FileShare](192.168.10.60) |            |                v                                   |
- |        |                |         |       (Blocked via ACL) ----------------------------------------|
- |        v                v         |             |
- |   (Allowed) ----> [Shared_Fin_Srv]|             |
- |                    (10.50)        |             v
- =====================================             
-               |                 ^                 
-               |                 |                 
-          (Blocked via ACL) -----X------------------|---------------|---------------------------------------
-               |                                    |
-               v                                    v
+```text
+                            [ The Internet / WAN Cloud ]
+                                          |
+                              [ Next-Gen Firewall (NGFW) ]
+                              (Perimeter Stateful Defense)
+                                          |
+                              [ Edge Router / Firewall (2911) ]
+                                          |
+                                          | g0/0 (802.1Q Trunk Link)
+                                          |
+                                [ Core Switch (2960) ]
+             _____________________________|__________________________________
+            |                             |                                  |
+        [ Trunk / VTP ]               [ Fa0/3 ]                          [ Fa0/4 ]
+            |                             |                                  |
+==========🔴 THE RED ZONE ==========   ===============🔵 BLUE ZONE ============ ============🟢 GREEN ZONE ============
+|  (High-Privilege Security Policy) |   |  VLAN 20: HR & Administration    | |  VLAN 30: IT / SOC / IAM        |
+|                                   |   |  Subnet: 192.168.20.0/24         | |  Subnet: 192.168.30.0/24        |
+|  Executive Suite [3rd Floor]      |   |                                  | |                                |
+|  VLAN 15                          |   |  [HR_PC]          [HR_Server]    | |  [IT_PC]        [AD_DomainCtrl] |
+|  Subnet: 192.168.15.0/24          |   |  (Wired Ethernet)(192.168.20.50) | |  (Wired Ethernet)(192.168.30.100)|
+|  - CEO/COO/Directors PCs (Wired)  |   |                                  | |                                |
+|  - Exec Smartphones (Wi-Fi)       |   |  [HR_Phone]       [HR_FileServer]| |  [IT_Phone]     [Log_Server]     |
+|         \                         |   |  (Wi-Fi)          (192.168.20.60)| |  (Wi-Fi)        (192.168.30.200)|
+|          \                        |   |        |                  ^      | |        |        [DHCP_Server]  |
+|           v                       |   |        v                  |      | |        v        (192.168.30.2) |
+|  Finance [2nd Floor: Finance Dept]|   (Allowed) --------->        |      | |    (Allowed) --------->        |
+|  VLAN 10                          |   =================================== |                                 |
+|  Subnet: 192.168.10.0/24          |            |                  ^      | |                                 |
+|  - [Finance_PC], [CFO_PC] (Wired) |            |                  |      | ===================================
+|  - [Fin_Phone] (Wi-Fi Smartphone) |            |                  X (Blocked via ACL)                 ^
+|  - [Fin_FileShare](192.168.10.60) |            |                  v                                   |
+|         |                 |       |   (Blocked via ACL) ------------------------------------------|
+|         v                 v       |            |
+|    (Allowed) ----> [Shared_Fin_Srv]            |
+|                     (10.50)       |            v
+=====================================             
+            |                 ^                    
+            |                 |                    
+         (Blocked via ACL) -----X------------------|---------------|---------------------------------------
+            |                                      |
+            v                                      v
         =====================================🟡 YELLOW ZONE =====================================
         |  VLAN 40: Guest Space (Wired & Mobility Tier)                                         |
         |  Subnet: 192.168.40.0/24                                                              |
         |                                                                                       |
         |  [Guest Kiosk PC] (Wired Fa0/5) --\                                                   |
-        |                                     +--> [VLAN 40 Gateway] -> X (Implicitly Dropped via ACL) |
+        |                                    +--> [VLAN 40 Gateway] -> X (Implicitly Dropped)   |
         |  [Guest SmartPhones] (Wi-Fi) -----/                                                   |
         |  - Connected via Corporate-Guest SSID Mobility Array                                  |
         =========================================================================================
@@ -114,9 +114,9 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
         |   `-- [IP_Surveillance_Cam_1] --- (Static IP: 192.168.50.11 on Switch Port Fa0/12)    |
         |                                                                                       |
         |  [Corporate-IoT SSID Wi-Fi Broadcast Matrix]                                          |
-        |   |-- [Boardroom_SmartTV] ------- (Static IP: 192.168.50.30 via WAP Client Link)       |
-        |   |-- [Smart_Thermostat_Node] --- (DHCP Pool Assigned via WAP Client Link)             |
-        |   `-- [Wireless_CCTV_Camera_2] -- (Static IP: 192.168.50.12 via WAP Client Link)       |
+        |   |-- [Boardroom_SmartTV] ------- (Static IP: 192.168.50.30 via WAP Client Link)      |
+        |   |-- [Smart_Thermostat_Node] --- (DHCP Pool Assigned via WAP Client Link)            |
+        |   `-- [Wireless_CCTV_Camera_2] -- (Static IP: 192.168.50.12 via WAP Client Link)      |
         |                                                                                       |
         |  --> X (Unsolicited Outbound Communications Blocked via Edge Router Gateway ACL)      |
         =========================================================================================
@@ -126,15 +126,15 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
         |  Subnet: 192.168.99.0/24                                                              |
         |                                                                                       |
         |  [Network Admin PC] (Wired: 192.168.99.100) ----> [Switch SVIs & Router VTY Lines]    |
-        |                                                    (Only allowed host via Access-Class)|
+        |                                            (Only allowed host via Access-Class)       |
         =========================================================================================
 
         =====================================🔒 HARDENED DMZ SERVER FARM =======================
         |  VLAN 100: Hardened DMZ Server Farm (Public-Facing Isolation Tier)                    |
         |  Subnet: 192.168.100.0/24                                                             |
         |                                                                                       |
-        |  [App Server]     [Mail Server]     [Web Server]      [SFTP Server]                   |
-        |  (192.168.100.10) (192.168.100.20)  (192.168.100.30)  (192.168.100.40)                |
+        |  [App Server]      [Mail Server]     [Web Server]      [SFTP Server]                  |
+        |  (192.168.100.10)  (192.168.100.20)  (192.168.100.30)  (192.168.100.40)               |
         |                                                                                       |
         |  --> (Isolated from internal networks; traffic inspected statefully via NGFW perimeter)|
         =========================================================================================
@@ -146,6 +146,7 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
         =========================================================================================
 
 ```
+
 
 ## 🎯 Perimeter vs. Internal Boundary Separation
 
@@ -235,208 +236,9 @@ To maximize enterprise accuracy, our datacenter zone maps dedicated functional s
 
 ---
 
-## ⚙️ Step-by-Step Configuration Guide
 
-### Step 1 – Create and Name VLANs on the Switch
-Initialize the broadcast domains on the Layer 2 switch and associate active access interfaces with their designated departments.
 
-```text
-Switch> enable
-Switch# configure terminal
 
-! Initialize Corporate VLAN Databases
-Switch(config)# vlan 10
-Switch(config-vlan)# name Finance
-Switch(config)# vlan 15
-Switch(config-vlan)# name Admin
-Switch(config)# vlan 20
-Switch(config-vlan)# name HR
-Switch(config)# vlan 30
-Switch(config-vlan)# name IT
-Switch(config)# vlan 40
-Switch(config-vlan)# name Guest
-Switch(config)# vlan 50
-Switch(config-vlan)# name IoT_and_Printers
-Switch(config)# vlan 99
-Switch(config-vlan)# name Out-of-Band_Mgmt
-Switch(config)# vlan 100
-Switch(config-vlan)# name DMZ_Server_Farm
-Switch(config)# exit
-
-! Assign Hardware Interfaces to Respective VLAN Domains
-Switch(config)# interface fa0/1
-Switch(config-if)# switchport mode access
-Switch(config-if)# switchport access vlan 10
-
-Switch(config)# interface fa0/2
-Switch(config-if)# switchport mode access
-Switch(config-if)# switchport access vlan 15
-
-Switch(config)# interface fa0/3
-Switch(config-if)# switchport mode access
-Switch(config-if)# switchport access vlan 20
-
-Switch(config)# interface fa0/4
-Switch(config-if)# switchport mode access
-Switch(config-if)# switchport access vlan 30
-
-Switch(config)# interface fa0/5
-Switch(config-if)# switchport mode access
-Switch(config-if)# switchport access vlan 40
-
-! Assign Hardware Port for the IoT Devices & Network Printers
-Switch(config)# interface fa0/10
-Switch(config-if)# switchport mode access
-Switch(config-if)# switchport access vlan 50
-
-! Assign Hardware Ports for Wired Surveillance Cameras and NVR Hubs
-Switch(config)# interface fa0/11
-Switch(config-if)# switchport mode access
-Switch(config-if)# switchport access vlan 50
-
-Switch(config)# interface fa0/12
-Switch(config-if)# switchport mode access
-Switch(config-if)# switchport access vlan 50
-Switch(config-if)# exit
-```
-
-### Step 2 – Configure Trunk Ports to Router and Access Point
-
-Establish a persistent 802.1Q trunk uplink interface to carry multiplexed multi-VLAN traffic between the core switch, the edge router, and the multi-SSID wireless access point array.
-
-```text
-! Trunk to Core Router
-Switch(config)# interface fa0/24
-Switch(config-if)# switchport mode trunk
-Switch(config-if)# switchport trunk allowed vlan 10,15,20,30,40,50,99,100
-Switch(config-if)# exit
-
-! Trunk to Wireless Access Point (Aggregating Secure departments, Guest, and IoT Wireless SSIDs)
-Switch(config)# interface fa0/6
-Switch(config-if)# description Trunk Link to Corporate Wireless Access Point
-Switch(config-if)# switchport mode trunk
-Switch(config-if)# switchport trunk allowed vlan 10,15,20,30,40,50
-Switch(config-if)# exit
-```
-
-### Step 3 – Configure Router-on-a-Stick (Logical Subinterfaces)
-
-Create logical subinterfaces on the router's physical interface. Each subinterface tags and terminates traffic for its respective VLAN using standard 802.1Q encapsulation.
-
-```text
-Router> enable
-Router# configure terminal
-
-! Interface cleanup and activation
-Router(config)# interface g0/0
-Router(config-if)# no shutdown
-Router(config-if)# exit
-
-! Subinterface for VLAN 10 (Finance Dept & File Storage Vault)
-Router(config)# interface g0/0.10
-Router(config-subif)# description Default Gateway for Finance
-Router(config-subif)# encapsulation dot1Q 10
-Router(config-subif)# ip address 192.168.10.1 255.255.255.0
-Router(config-subif)# exit
-
-! Subinterface for VLAN 15 (Admin / Exec Suite - CEO/COO/CFO)
-Router(config)# interface g0/0.15
-Router(config-subif)# description Default Gateway for Admin
-Router(config-subif)# encapsulation dot1Q 15
-Router(config-subif)# ip address 192.168.15.1 255.255.255.0
-Router(config-subif)# exit
-
-! Subinterface for VLAN 20 (HR & Local Administrative Share)
-Router(config)# interface g0/0.20
-Router(config-subif)# description Default Gateway for HR
-Router(config-subif)# encapsulation dot1Q 20
-Router(config-subif)# ip address 192.168.20.1 255.255.255.0
-Router(config-subif)# exit
-
-! Subinterface for VLAN 30 (IT / SOC / IAM / Secure Wireless Hub)
-Router(config)# interface g0/0.30
-Router(config-subif)# description Default Gateway for IT/SOC/IAM
-Router(config-subif)# encapsulation dot1Q 30
-Router(config-subif)# ip address 192.168.30.1 255.255.255.0
-Router(config-subif)# exit
-
-! Subinterface for VLAN 40 (Guest Mobility Domain)
-Router(config)# interface g0/0.40
-Router(config-subif)# description Default Gateway for Guests
-Router(config-subif)# encapsulation dot1Q 40
-Router(config-subif)# ip address 192.168.40.1 255.255.255.0
-Router(config-subif)# exit
-
-! Subinterface for VLAN 50 (IoT & Quarantined Printer Peripherals / CCTV Network)
-Router(config)# interface g0/0.50
-Router(config-subif)# description Default Gateway for IoT, MFPs, and CCTV
-Router(config-subif)# encapsulation dot1Q 50
-Router(config-subif)# ip address 192.168.50.1 255.255.255.0
-Router(config-subif)# exit
-
-! Subinterface for VLAN 99 (Out-of-Band Management Environment)
-Router(config)# interface g0/0.99
-Router(config-subif)# description Default Gateway for OOBM
-Router(config-subif)# encapsulation dot1Q 99
-Router(config-subif)# ip address 192.168.99.1 255.255.255.0
-Router(config-subif)# exit
-
-! Subinterface for VLAN 100 (Hardened DMZ Cluster Tier)
-Router(config)# interface g0/0.100
-Router(config-subif)# description Default Gateway for Hardened DMZ
-Router(config-subif)# encapsulation dot1Q 100
-Router(config-subif)# ip address 192.168.100.1 255.255.255.0
-Router(config-subif)# exit
-```
-
-### Step 4 – Configure Centralized DHCP Scopes
-
-Automate network scaling, asset tracking, and device management profiles by executing dynamic lease scopes directly on the router's localized pools:
-
-```text
-! Exclude default gateway tracking and static infrastructure server IPs from scope distribution
-Router(config)# ip dhcp excluded-address 192.168.10.1 192.168.10.99
-Router(config)# ip dhcp excluded-address 192.168.15.1 192.168.15.9
-Router(config)# ip dhcp excluded-address 192.168.20.1 192.168.20.99
-Router(config)# ip dhcp excluded-address 192.168.30.1 192.168.30.99
-Router(config)# ip dhcp excluded-address 192.168.40.1 192.168.40.9
-Router(config)# ip dhcp excluded-address 192.168.50.1 192.168.50.99
-
-! Configure pools per segment
-Router(config)# ip dhcp pool Finance_Pool
-Router(dhcp-config)# network 192.168.10.0 255.255.255.0
-Router(dhcp-config)# default-router 192.168.10.1
-Router(dhcp-config)# dns-server 192.168.30.100
-Router(dhcp-config)# exit
-
-Router(config)# ip dhcp pool Admin_Pool
-Router(dhcp-config)# network 192.168.15.0 255.255.255.0
-Router(dhcp-config)# default-router 192.168.15.1
-Router(dhcp-config)# dns-server 192.168.30.100
-Router(dhcp-config)# exit
-
-Router(config)# ip dhcp pool HR_Pool
-Router(dhcp-config)# network 192.168.20.0 255.255.255.0
-Router(dhcp-config)# default-router 192.168.20.1
-Router(dhcp-config)# dns-server 192.168.30.100
-Router(dhcp-config)# exit
-
-Router(config)# ip dhcp pool IT_Pool
-Router(dhcp-config)# network 192.168.30.0 255.255.255.0
-Router(dhcp-config)# default-router 192.168.30.1
-Router(dhcp-config)# dns-server 192.168.30.100
-Router(dhcp-config)# exit
-
-Router(config)# ip dhcp pool Guest_Pool
-Router(dhcp-config)# network 192.168.40.0 255.255.255.0
-Router(dhcp-config)# default-router 192.168.40.1
-Router(dhcp-config)# exit
-
-Router(config)# ip dhcp pool IoT_Pool
-Router(dhcp-config)# network 192.168.50.0 255.255.255.0
-Router(dhcp-config)# default-router 192.168.50.1
-Router(dhcp-config)# exit
-```
 
 🔄 The Automated Handshake: How Devices Get an IP (D.O.R.A.)
 
@@ -452,82 +254,8 @@ When an unconfigured asset attaches to an access port or logs into a wireless SS
 
 ---
 
-## Step 5 – Configure Access Control Lists (Core Security Optimization)
 
-To implement functional Inter-VLAN security boundaries within Cisco IOS Router-on-a-Stick deployments, Extended Access Control Lists are mapped precisely to logical subinterfaces.
 
-```text
-! ====================================================================
-! 1. DEFINE ACCESS CONTROL LISTS
-! ====================================================================
-
-! --- ACL for Executive Suite / Admin Tiers (VLAN 15) ---
-Router(config)# ip access-list extended ADMIN_INBOUND_ACL
-Router(config-ext-nacl)# permit tcp any any established
-Router(config-ext-nacl)# deny ip 192.168.15.0 0.0.0.255 host 192.168.10.50
-Router(config-ext-nacl)# permit ip any any
-Router(config-ext-nacl)# exit
-
-! --- ACL for HR & Administration (VLAN 20) ---
-Router(config)# ip access-list extended HR_INBOUND_ACL
-Router(config-ext-nacl)# permit tcp any any established
-Router(config-ext-nacl)# deny ip 192.168.20.0 0.0.0.255 192.168.30.0 0.0.0.255
-Router(config-ext-nacl)# permit ip any any
-Router(config-ext-nacl)# exit
-
-! --- ACL for Guest Space Mobility Domain (VLAN 40) ---
-Router(config)# ip access-list extended GUEST_INBOUND_ACL
-Router(config-ext-nacl)# deny ip 192.168.40.0 0.0.0.255 192.168.0.0 0.0.255.255
-Router(config-ext-nacl)# permit ip any any
-Router(config-ext-nacl)# exit
-
-! --- ACL for IoT & Hardened Printer Domain (VLAN 50) ---
-Router(config)# ip access-list extended IOT_INBOUND_ACL
-Router(config-ext-nacl)# deny ip 192.168.50.0 0.0.0.255 192.168.0.0 0.0.255.255
-Router(config-ext-nacl)# permit ip any any
-Router(config-ext-nacl)# exit
-
-! --- ACL for Out-of-Band Management Tier (VLAN 99) ---
-Router(config)# ip access-list extended OOBM_INBOUND_ACL
-Router(config-ext-nacl)# permit ip host 192.168.99.100 any
-Router(config-ext-nacl)# deny ip any any
-Router(config-ext-nacl)# exit
-
-! --- ACL for Hardened DMZ Server Farm (VLAN 100) ---
-Router(config)# ip access-list extended DMZ_INBOUND_ACL
-Router(config-ext-nacl)# permit tcp any any established
-Router(config-ext-nacl)# deny ip 192.168.100.0 0.0.0.255 192.168.0.0 0.0.255.255
-Router(config-ext-nacl)# permit ip any any
-Router(config-ext-nacl)# exit
-
-! ====================================================================
-! 2. BIND ACCESS CONTROL LISTS TO LOGICAL SUBINTERFACES (INGRESS)
-! ====================================================================
-
-Router(config)# interface g0/0.15
-Router(config-subif)# ip access-group ADMIN_INBOUND_ACL in
-Router(config-subif)# exit
-
-Router(config)# interface g0/0.20
-Router(config-subif)# ip access-group HR_INBOUND_ACL in
-Router(config-subif)# exit
-
-Router(config)# interface g0/0.40
-Router(config-subif)# ip access-group GUEST_INBOUND_ACL in
-Router(config-subif)# exit
-
-Router(config)# interface g0/0.50
-Router(config-subif)# ip access-group IOT_INBOUND_ACL in
-Router(config-subif)# exit
-
-Router(config)# interface g0/0.99
-Router(config-subif)# ip access-group OOBM_INBOUND_ACL in
-Router(config-subif)# exit
-
-Router(config)# interface g0/0.100
-Router(config-subif)# ip access-group DMZ_INBOUND_ACL in
-Router(config-subif)# exit
-```
 ## 🧪 Verification & Testing Validation
 
 ### Automated Test Cases Matrix
@@ -601,5 +329,324 @@ This advanced lab project moves far beyond entry-level infrastructure concepts, 
 #CyberSecurity #SOC #IAM #Networking #VLAN #ACL #CiscoPacketTracer #ITSecurity #EthicalHacking #NetworkSecurity #VulnerabilityManagement #PortfolioProject #EnterpriseNetwork #Subnetting #ActiveDirectory #IdentityManagement #PrintSecurity
 
 
+---
 
+## APPENDIX: FULL CISCO DEVICE & SERVICE CONFIGURATIONS
 
+#### 1. SWITCH CONFIGURATION (VLANs & Access Ports)
+
+## ⚙️ Step-by-Step Configuration Guide
+
+### Step 1 – Create and Name VLANs on the Switch
+Initialize the broadcast domains on the Layer 2 switch and associate active access interfaces with their designated departments.
+```markdown
+```text
+Switch> enable
+Switch# configure terminal
+
+! Initialize Corporate VLAN Databases
+Switch(config)# vlan 10
+Switch(config-vlan)# name Finance
+Switch(config)# vlan 15
+Switch(config-vlan)# name Executive_Suite
+Switch(config)# vlan 20
+Switch(config-vlan)# name HR_and_Administration
+Switch(config)# vlan 30
+Switch(config-vlan)# name IT_SOC_IAM
+Switch(config)# vlan 40
+Switch(config-vlan)# name Guest_Space
+Switch(config)# vlan 50
+Switch(config-vlan)# name IoT_and_Printers
+Switch(config)# vlan 99
+Switch(config-vlan)# name Out-of-Band_Mgmt
+Switch(config)# vlan 100
+Switch(config-vlan)# name DMZ_Server_Farm
+Switch(config)# exit
+
+! Assign Hardware Interfaces to Respective VLAN Domains
+Switch(config)# interface fa0/1
+Switch(config-if)# description Finance Department (VLAN 10)
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 10
+
+Switch(config)# interface fa0/2
+Switch(config-if)# description Executive Suite - CEO & COO (VLAN 15)
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 15
+
+Switch(config)# interface fa0/3
+Switch(config-if)# description HR & Administration (VLAN 20)
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 20
+
+Switch(config)# interface fa0/4
+Switch(config-if)# description IT / SOC / IAM (VLAN 30)
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 30
+
+Switch(config)# interface fa0/5
+Switch(config-if)# description Guest Space (VLAN 40)
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 40
+
+! Assign Hardware Port for the IoT Devices & Network Printers
+Switch(config)# interface fa0/10
+Switch(config-if)# description IoT and Network Printers (VLAN 50)
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 50
+
+! Assign Hardware Ports for Wired Surveillance Cameras and NVR Hubs
+Switch(config)# interface fa0/11
+Switch(config-if)# description CCTV NVR Node 1 (VLAN 50)
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 50
+
+Switch(config)# interface fa0/12
+Switch(config-if)# description CCTV NVR Node 2 (VLAN 50)
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 50
+Switch(config-if)# exit
+
+! Assign Hardware Ports for Management and DMZ
+Switch(config)# interface fa0/20
+Switch(config-if)# description Out-of-Band Management (VLAN 99)
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 99
+
+Switch(config)# interface fa0/23
+Switch(config-if)# description DMZ Server Farm (VLAN 100)
+Switch(config-if)# switchport mode access
+Switch(config-if)# switchport access vlan 100
+Switch(config-if)# exit
+
+```
+
+### Step 2 – Configure Trunk Ports to Router and Access Point
+
+Establish a persistent 802.1Q trunk uplink interface to carry multiplexed multi-VLAN traffic between the core switch, the edge router, and the multi-SSID wireless access point array.
+
+```text
+
+! Trunk to Core Router
+Switch(config)# interface fa0/24
+Switch(config-if)# description Trunk Link to Core Router
+Switch(config-if)# switchport mode trunk
+Switch(config-if)# switchport trunk allowed vlan 10,15,20,30,40,50,99,100
+Switch(config-if)# exit
+
+! Trunk to Wireless Access Point Array (AP-01 Center, AP-02 Left Wing, AP-03 Right Wing)
+Switch(config)# interface range fa0/6 - fa0/8
+Switch(config-if-range)# description Trunk Links to Wireless Access Point Array (AP-01 to AP-03)
+Switch(config-if-range)# switchport mode trunk
+Switch(config-if-range)# switchport trunk allowed vlan 10,15,20,30,40,50
+Switch(config-if-range)# exit
+
+```
+
+### Step 3 – Configure Router-on-a-Stick (Logical Subinterfaces)
+
+```
+
+Create logical subinterfaces on the router's physical interface. Each subinterface tags and terminates traffic for its respective VLAN using standard 802.1Q encapsulation.
+
+```text
+Router> enable
+Router# configure terminal
+
+! Interface cleanup and activation
+Router(config)# interface g0/0
+Router(config-if)# no shutdown
+Router(config-if)# exit
+
+! Subinterface for VLAN 10 (Finance Dept & File Storage Vault)
+Router(config)# interface g0/0.10
+Router(config-subif)# description Default Gateway for Finance
+Router(config-subif)# encapsulation dot1Q 10
+Router(config-subif)# ip address 192.168.10.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 15 (Executive Suite - CEO/COO)
+Router(config)# interface g0/0.15
+Router(config-subif)# description Default Gateway for Executive Suite
+Router(config-subif)# encapsulation dot1Q 15
+Router(config-subif)# ip address 192.168.15.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 20 (HR & Local Administrative Share)
+Router(config)# interface g0/0.20
+Router(config-subif)# description Default Gateway for HR
+Router(config-subif)# encapsulation dot1Q 20
+Router(config-subif)# ip address 192.168.20.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 30 (IT / SOC / IAM / Secure Wireless Hub)
+Router(config)# interface g0/0.30
+Router(config-subif)# description Default Gateway for IT/SOC/IAM
+Router(config-subif)# encapsulation dot1Q 30
+Router(config-subif)# ip address 192.168.30.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 40 (Guest Mobility Domain)
+Router(config)# interface g0/0.40
+Router(config-subif)# description Default Gateway for Guests
+Router(config-subif)# encapsulation dot1Q 40
+Router(config-subif)# ip address 192.168.40.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 50 (IoT & Quarantined Printer Peripherals / CCTV Network)
+Router(config)# interface g0/0.50
+Router(config-subif)# description Default Gateway for IoT, MFPs, and CCTV
+Router(config-subif)# encapsulation dot1Q 50
+Router(config-subif)# ip address 192.168.50.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 99 (Out-of-Band Management Environment)
+Router(config)# interface g0/0.99
+Router(config-subif)# description Default Gateway for OOBM
+Router(config-subif)# encapsulation dot1Q 99
+Router(config-subif)# ip address 192.168.99.1 255.255.255.0
+Router(config-subif)# exit
+
+! Subinterface for VLAN 100 (Hardened DMZ Cluster Tier)
+Router(config)# interface g0/0.100
+Router(config-subif)# description Default Gateway for Hardened DMZ
+Router(config-subif)# encapsulation dot1Q 100
+Router(config-subif)# ip address 192.168.100.1 255.255.255.0
+Router(config-subif)# exit
+```
+
+### Step 4 – Configure Centralized DHCP Scopes
+
+Automate network scaling, asset tracking, and device management profiles by executing dynamic lease scopes directly on the router's localized pools:
+
+```text
+```text
+! Exclude default gateway tracking and static infrastructure server IPs from scope distribution
+Router(config)# ip dhcp excluded-address 192.168.10.1 192.168.10.99
+Router(config)# ip dhcp excluded-address 192.168.15.1 192.168.15.9
+Router(config)# ip dhcp excluded-address 192.168.20.1 192.168.20.99
+Router(config)# ip dhcp excluded-address 192.168.30.1 192.168.30.99
+Router(config)# ip dhcp excluded-address 192.168.40.1 192.168.40.9
+Router(config)# ip dhcp excluded-address 192.168.50.1 192.168.50.99
+
+! Configure pools per segment
+Router(config)# ip dhcp pool Finance_Pool
+Router(dhcp-config)# network 192.168.10.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.10.1
+Router(dhcp-config)# dns-server 192.168.30.100
+Router(dhcp-config)# exit
+
+Router(config)# ip dhcp pool Executive_Pool
+Router(dhcp-config)# network 192.168.15.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.15.1
+Router(dhcp-config)# dns-server 192.168.30.100
+Router(dhcp-config)# exit
+
+Router(config)# ip dhcp pool HR_Admin_Pool
+Router(dhcp-config)# network 192.168.20.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.20.1
+Router(dhcp-config)# dns-server 192.168.30.100
+Router(dhcp-config)# exit
+
+Router(config)# ip dhcp pool IT_SOC_IAM_Pool
+Router(dhcp-config)# network 192.168.30.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.30.1
+Router(dhcp-config)# dns-server 192.168.30.100
+Router(dhcp-config)# exit
+
+Router(config)# ip dhcp pool Guest_Pool
+Router(dhcp-config)# network 192.168.40.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.40.1
+Router(dhcp-config)# exit
+
+Router(config)# ip dhcp pool IoT_Printers_Pool
+Router(dhcp-config)# network 192.168.50.0 255.255.255.0
+Router(dhcp-config)# default-router 192.168.50.1
+Router(dhcp-config)# exit
+
+```
+## Step 5 – Configure Access Control Lists (Core Security Optimization)
+
+To implement functional Inter-VLAN security boundaries within Cisco IOS Router-on-a-Stick deployments, Extended Access Control Lists are mapped precisely to logical subinterfaces.
+
+```text
+! ====================================================================
+! 1. DEFINE ACCESS CONTROL LISTS
+! ====================================================================
+
+! --- ACL for Finance Department (VLAN 10) ---
+Router(config)# ip access-list extended FINANCE_INBOUND_ACL
+Router(config-ext-nacl)# permit tcp any any established
+Router(config-ext-nacl)# permit ip any any
+Router(config-ext-nacl)# exit
+
+! --- ACL for Executive Suite Tiers (VLAN 15) ---
+Router(config)# ip access-list extended EXECUTIVE_INBOUND_ACL
+Router(config-ext-nacl)# permit tcp any any established
+Router(config-ext-nacl)# deny ip 192.168.15.0 0.0.0.255 host 192.168.10.50
+Router(config-ext-nacl)# permit ip any any
+Router(config-ext-nacl)# exit
+
+! --- ACL for HR & Administration (VLAN 20) ---
+Router(config)# ip access-list extended HR_INBOUND_ACL
+Router(config-ext-nacl)# permit tcp any any established
+Router(config-ext-nacl)# deny ip 192.168.20.0 0.0.0.255 192.168.30.0 0.0.0.255
+Router(config-ext-nacl)# permit ip any any
+Router(config-ext-nacl)# exit
+
+! --- ACL for Guest Space Mobility Domain (VLAN 40) ---
+Router(config)# ip access-list extended GUEST_INBOUND_ACL
+Router(config-ext-nacl)# deny ip 192.168.40.0 0.0.0.255 192.168.0.0 0.0.255.255
+Router(config-ext-nacl)# permit ip any any
+Router(config-ext-nacl)# exit
+
+! --- ACL for IoT & Hardened Printer Domain (VLAN 50) ---
+Router(config)# ip access-list extended IOT_INBOUND_ACL
+Router(config-ext-nacl)# deny ip 192.168.50.0 0.0.0.255 192.168.0.0 0.0.255.255
+Router(config-ext-nacl)# permit ip any any
+Router(config-ext-nacl)# exit
+
+! --- ACL for Out-of-Band Management Tier (VLAN 99) ---
+Router(config)# ip access-list extended OOBM_INBOUND_ACL
+Router(config-ext-nacl)# permit ip host 192.168.99.100 any
+Router(config-ext-nacl)# deny ip any any
+Router(config-ext-nacl)# exit
+
+! --- ACL for Hardened DMZ Server Farm (VLAN 100) ---
+Router(config)# ip access-list extended DMZ_INBOUND_ACL
+Router(config-ext-nacl)# permit tcp any any established
+Router(config-ext-nacl)# deny ip 192.168.100.0 0.0.0.255 192.168.0.0 0.0.255.255
+Router(config-ext-nacl)# permit ip any any
+Router(config-ext-nacl)# exit
+
+! ====================================================================
+! 2. BIND ACCESS CONTROL LISTS TO LOGICAL SUBINTERFACES (INGRESS)
+! ====================================================================
+
+Router(config)# interface g0/0.10
+Router(config-subif)# ip access-group FINANCE_INBOUND_ACL in
+Router(config-subif)# exit
+
+Router(config)# interface g0/0.15
+Router(config-subif)# ip access-group EXECUTIVE_INBOUND_ACL in
+Router(config-subif)# exit
+
+Router(config)# interface g0/0.20
+Router(config-subif)# ip access-group HR_INBOUND_ACL in
+Router(config-subif)# exit
+
+Router(config)# interface g0/0.40
+Router(config-subif)# ip access-group GUEST_INBOUND_ACL in
+Router(config-subif)# exit
+
+Router(config)# interface g0/0.50
+Router(config-subif)# ip access-group IOT_INBOUND_ACL in
+Router(config-subif)# exit
+
+Router(config)# interface g0/0.99
+Router(config-subif)# ip access-group OOBM_INBOUND_ACL in
+Router(config-subif)# exit
+
+Router(config)# interface g0/0.100
+Router(config-subif)# ip access-group DMZ_INBOUND_ACL in
+Router(config-subif)# exit
