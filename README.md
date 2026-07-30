@@ -173,7 +173,136 @@ With the physical network topology upgraded to include an edge security applianc
 - **The Ransomware Blast Radius Simulation:** This architecture provides a documented engineering control against network-wide compromises. If an untrusted endpoint triggers a malicious payload, the core storage file shares (Finance/HR FileServers), identity nodes (Active Directory DC), and the underlying centralized log environments (Logging_Server) remain 100% clean and isolated. The attack plane is successfully bounded, minimizing remediation overhead and allowing security operations analysts to preserve evidence securely.
 
 - **Proposed Future GNS3 Framework Scalability:** While this Packet Tracer deployment perfectly validates the mathematical logic, addressing pools, and core traffic engineering choices, real-world scaling can be migrated into a GNS3 hypervisor cluster for advanced engineering evaluations. Moving this layout to GNS3 later allows a security engineer to replace logical router abstractions with true hardware kernel appliances (such as Cisco IOSv QEMU binaries and production-grade FortiGate stateful firewall operating systems). That evolution allows analysts to test real-world deep packet inspection (DPI), stateful tracking metrics, and raw syslog ingestion streams passing directly out of live Windows Server 2022 Core Domain Controller VMs and into live dockerized SIEM monitoring nodes (Elastic / Wazuh), elevating this network simulation into a real-world, high-fidelity security staging lab.
+Future Enterprise Expansion Recommendations
 
+Identity Infrastructure
+
+* Microsoft Windows Server 2022
+* Active Directory Domain Services (AD DS)
+* DNS
+* DHCP
+* Organizational Units (OUs)
+* Group Policy Objects (GPOs)
+* PowerShell automation (1,000+ user creation)
+* Password reset simulations
+* Account lockout policies
+* User onboarding/offboarding
+* Shared folders with NTFS permissions
+
+⸻
+
+Endpoint Operating Systems
+
+* Windows 11 Enterprise (Domain Joined)
+* Windows 10 Enterprise
+* Ubuntu Server 24.04 LTS
+* Ubuntu Desktop
+* Kali Linux
+* Windows Server Core (optional)
+
+⸻
+
+Enterprise Firewall
+
+* FortiGate VM
+* Stateful Firewall Policies
+* NAT
+* IPS
+* SSL Inspection
+* Web Filtering
+* Application Control
+* Security Profiles
+* Policy-based Routing
+* Site-to-Site IPsec VPN
+* SSL VPN
+* Security Logging
+
+⸻
+
+WAN & Branch Office
+
+* Headquarters
+* Remote Branch Office
+* Site-to-Site IPsec VPN
+* SD-WAN
+* Dual ISP Simulation
+* WAN Failover
+* Performance SLA Monitoring
+* Dynamic Routing (OSPF)
+* Static Route Failover
+
+⸻
+
+Enterprise Servers
+
+* Domain Controller
+* DNS Server
+* DHCP Server
+* Web Server (Apache/IIS)
+* Mail Server
+* Finance Server
+* HR Server
+* File Server
+* Print Server
+* Certificate Authority (PKI)
+* WSUS Server
+* SIEM Server
+
+⸻
+
+Security Monitoring
+
+* Sysmon
+* Windows Event Logs
+* Linux Syslog
+* FortiGate Logs
+* Wazuh
+* Splunk
+* Security Onion (optional)
+
+⸻
+
+Security Validation
+
+* Nmap
+* Wireshark
+* tcpdump
+* Hydra (authorized lab only)
+* Nikto
+* OpenVAS/Greenbone
+* Nessus Essentials (optional)
+* Firewall Rule Validation
+* VLAN Isolation Testing
+* VPN Testing
+* DNS Testing
+* SMB Testing
+* Kerberos Authentication
+* RDP Security Testing
+* Web Application Testing
+
+⸻
+
+Automation
+
+* PowerShell
+* Bash
+* Scheduled Backups
+* User Provisioning Scripts
+* Configuration Backups
+* Infrastructure Documentation
+
+⸻
+
+Future Cloud Expansion
+
+* Microsoft Entra ID (Azure AD)
+* Azure VPN Gateway
+* Azure Virtual Network
+* Hybrid Identity
+* Azure Bastion
+* Microsoft Defender for Cloud
+* Microsoft Sentinel
+* AWS VPC Integration (optional)
 - **Layer 2 Physical Port-Security Hardening:** Mitigates unauthorized physical site infiltration or rogue asset drops using local switch interface parameters to shutdown unassigned empty wall jacks instantly:
 
 ```text
