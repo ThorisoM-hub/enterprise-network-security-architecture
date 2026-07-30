@@ -199,7 +199,7 @@ Note: The Next-Generation Firewall (NGFW) shown in the topology is included as a
   - `Guest VLAN` -> Provisions restricted internet-only access for untrusted third-party endpoints, preventing internal network exposure.
   - `IoT VLAN` -> Implements strict device isolation for smart hardware to contain vulnerabilities inherent in legacy or unpatched firmware.
 
--  **Enterprise Hardening Recommendations
+-  **Enterprise Hardening Recommendations**
 
 * **BPDU Guard**: Disables PortFast-enabled access ports immediately if they receive unauthorized Spanning Tree Bridge Protocol Data Units, stopping rogue switch attachments.
 * **Root Guard**: Enforces the placement of the primary Root Bridge by preventing untrusted downstream switches from hijacking the Spanning Tree root position.
