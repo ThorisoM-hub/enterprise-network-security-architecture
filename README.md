@@ -260,7 +260,61 @@ Security Monitoring
 * Security Onion (optional)
 
 ⸻
+Network Infrastructure
 
+* Cisco IOSv Routers
+* Cisco IOSvL2 Switches
+* Cisco CSR1000v
+* Cisco ASAv Firewall
+
+Security
+
+* pfSense
+* FortiGate VM
+* Palo Alto VM
+* Suricata IDS
+* Snort IDS
+
+Servers
+
+* Windows Server 2022
+* Active Directory
+* DNS
+* DHCP
+* Group Policy
+* Certificate Services
+
+Linux
+
+* Ubuntu Server
+* Kali Linux
+* Wazuh Manager
+* Elastic Stack
+* Syslog Server
+
+Monitoring
+
+* Security Onion
+* Zeek
+* Elastic
+* Grafana
+* Prometheus
+
+Wireless
+
+* FreeRADIUS
+* WPA2 Enterprise
+* 802.1X
+* Dynamic VLAN Assignment
+
+Attacker Simulation
+
+* Metasploit
+* Kali
+* Nessus Essentials
+* Nmap
+* OpenVAS
+-----
 Security Validation
 
 * Nmap
