@@ -24,7 +24,14 @@ The network is divided into multiple departments using VLANs, with controlled co
   - `tracert` -> Charts intermediate hops to locate configuration flaws.
   - `ipconfig` -> Audits client NIC settings to verify gateway and AD DNS configurations.
   - `show vlan brief` -> Confirms physical access ports match defined configurations.
-  - `show access-lists` -> Displays policy tracking hit statistics.
+  - `show interfaces trunk` -> Validates active trunk lines, encapsulation states, and permitted VLAN traffic.
+  - `show ip interface brief` -> Summarizes layer-3 status, IP assignments, and operational readiness of all interfaces.
+  - `show ip route` -> Inspects the local routing table to verify path selection and protocol convergence.
+  - `show access-lists` -> Displays security policy configurations alongside real-time packet-matching hit statistics.
+  - `show ip dhcp binding` -> Audits active IP-to-MAC address leases assigned dynamically across the subnet segment.
+  - `show running-config` -> Evaluates active device memory configuration to verify current security controls.
+  - `show mac address-table` -> Maps physical hardware addresses to localized layer-2 switch ports for security audits.
+  - `show arp` -> Inspects the local Address Resolution Protocol cache mapping logical IPs to physical destinations.
 
 - **SOC Infrastructure Visibility & System Monitoring Mindset:** Architectural separation accounts for unified visibility mapping, incorporating dedicated Active Directory authentication monitoring and SOC log collection points to verify analytical tracking.
 
