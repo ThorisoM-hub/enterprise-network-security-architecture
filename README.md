@@ -199,22 +199,22 @@ Note: The Next-Generation Firewall (NGFW) shown in the topology is included as a
   - `Guest VLAN` -> Provisions restricted internet-only access for untrusted third-party endpoints, preventing internal network exposure.
   - `IoT VLAN` -> Implements strict device isolation for smart hardware to contain vulnerabilities inherent in legacy or unpatched firmware.
 
--  **Enterprise Hardening Recommendations**
+-  ***Enterprise Hardening Recommendations***
 
-* **BPDU Guard**: Disables PortFast-enabled access ports immediately if they receive unauthorized Spanning Tree Bridge Protocol Data Units, stopping rogue switch attachments.
-* **Root Guard**: Enforces the placement of the primary Root Bridge by preventing untrusted downstream switches from hijacking the Spanning Tree root position.
-* **Storm Control**: Monitors and suppresses excessive broadcast, multicast, or unicast traffic spikes on interfaces to eliminate network degradation and DoS conditions.
-* **DHCP Snooping**: Validates DHCP traffic by filtering out rogue DHCP servers and building a trusted binding table of IP-to-MAC associations.
-* **Dynamic ARP Inspection**: Leverages the DHCP Snooping database to intercept and validate all ARP packets, eliminating ARP poisoning and man-in-the-middle attacks.
-* **IP Source Guard**: Mitigates IP address spoofing attacks by dynamically blocking traffic from source IPs not listed in the DHCP Snooping table.
-* **PortFast**: Optimizes access port initialization by bypassing standard listening/learning Spanning Tree states for authorized endpoints.
-* **Disable DTP**: Disables interface auto-negotiation (`switchport nonegotiate`) on access ports to block unauthorized VLAN hopping exploits.
-* **Disable CDP Externally**: Turns off Cisco Discovery Protocol on internet-facing or untrusted boundaries to limit infrastructure information disclosure.
-* **SSH instead of Telnet**: Mandates encrypted Secure Shell (SSHv2) connections for all administrative command-line access, eliminating cleartext credential sniffing.
-* **Enable AAA**: Enforces centralized access control mechanisms to track administrative changes and authenticate operators.
-* **NTP**: Synchronizes clocks across all active hardware to maintain log integrity, clock alignment, and accurate security incident timelines.
-* **Syslog**: Standardizes administrative event and security notification streaming out to a centralized SIEM or remote log analyzer.
-* **SNMPv3**: Secures network monitoring streams via cryptographic encryption, message authentication, and explicit access control lists.
+    * **BPDU Guard**: Disables PortFast-enabled access ports immediately if they receive unauthorized Spanning Tree Bridge Protocol Data Units, stopping rogue switch attachments.
+    * **Root Guard**: Enforces the placement of the primary Root Bridge by preventing untrusted downstream switches from hijacking the Spanning Tree root position.
+    * **Storm Control**: Monitors and suppresses excessive broadcast, multicast, or unicast traffic spikes on interfaces to eliminate network degradation and DoS conditions.
+    * **DHCP Snooping**: Validates DHCP traffic by filtering out rogue DHCP servers and building a trusted binding table of IP-to-MAC associations.
+    * **Dynamic ARP Inspection**: Leverages the DHCP Snooping database to intercept and validate all ARP packets, eliminating ARP poisoning and man-in-the-middle attacks.
+    * **IP Source Guard**: Mitigates IP address spoofing attacks by dynamically blocking traffic from source IPs not listed in the DHCP Snooping table.
+    * **PortFast**: Optimizes access port initialization by bypassing standard listening/learning Spanning Tree states for authorized endpoints.
+    * **Disable DTP**: Disables interface auto-negotiation (`switchport nonegotiate`) on access ports to block unauthorized VLAN hopping exploits.
+    * **Disable CDP Externally**: Turns off Cisco Discovery Protocol on internet-facing or untrusted boundaries to limit infrastructure information disclosure.
+    * **SSH instead of Telnet**: Mandates encrypted Secure Shell (SSHv2) connections for all administrative command-line access, eliminating cleartext credential sniffing.
+    * **Enable AAA**: Enforces centralized access control mechanisms to track administrative changes and authenticate operators.
+    * **NTP**: Synchronizes clocks across all active hardware to maintain log integrity, clock alignment, and accurate security incident timelines.
+    * **Syslog**: Standardizes administrative event and security notification streaming out to a centralized SIEM or remote log analyzer.
+    * **SNMPv3**: Secures network monitoring streams via cryptographic encryption, message authentication, and explicit access control lists.
 
 ## 🔐 Security Implementation Summary
 
