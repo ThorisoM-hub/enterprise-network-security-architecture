@@ -139,16 +139,14 @@ When an unconfigured asset attaches to an access port or logs into a wireless SS
 With the physical network topology upgraded to include an edge security appliance labeled NGFW, the network implements a clear defense-in-depth model:
 * **Active Internal Enforcement (Cisco Router ACLs):** All inter-VLAN, role-based blocking rules (East-West traffic) are configured on the 2911 Edge Router via Extended Access Control Lists applied explicitly to logical subinterfaces. This ensures local containment so unprivileged internal subnets cannot reach restricted databases, identity directories, or backend storage segments.
 * **Perimeter Inspection Layer (NGFW Hardware Placement):** The dedicated edge security appliance is structurally placed at the true internet boundary. This layer is strategically positioned to handle high-compute Layer 7 protection (Application Control, URL Threat Intelligence, and Intrusion Prevention) for all traffic exiting the internal corporate subnets out to the wide-area network (North-South traffic).
-
+Note: The Next-Generation Firewall (NGFW) shown in the topology is included as an architectural representation of a production enterprise network. Cisco Packet Tracer does not emulate Layer 7 inspection, IPS, or advanced stateful firewall capabilities. These services are represented conceptually and would be implemented using Cisco Firepower, FortiGate, Palo Alto, or pfSense in a production environment or in GNS3/EVE-NG.
 ---
 ## 🛡️ Firewall & Perimeter Defense Layer
 
 * **Stateful Inspection vs. Stateless ACLs:** Unlike standard stateless ACL router controls that filter blindly on individual packet headers, the perimeter firewall enforces stateful inspection policies. It tracks active TCP connection handshakes originating from high-privilege corporate workstations (Exec Suites, Finance) out toward external web entities, ensuring returning traffic is strictly validated and linked to a verified, established internal session.
 * **Application-Layer Visibility (Layer 7 Defense):** The perimeter layer leverages deep packet inspection (DPI) to stop protocol-abuse attacks. If an asset inside the Executive Suite or HR network attempts to tunnel unapproved traffic or run malicious software over standard web ports (such as masking data exfiltration over Port 80 or 443), the firewall's application identification capabilities flag and neutralize the session immediately.
 * **Integrated Intrusion Prevention Systems (IPS):** The firewall runs dynamic signature matching engines to detect active exploitation attempts, software vulnerabilities, or network-layer scanning sequences targeting the internal corporate environment, generating telemetry drops directly to the security operations center (SOC) log collector.
-Note: The Next-Generation Firewall (NGFW) shown in the topology is included as an architectural representation of a production enterprise network. Cisco Packet Tracer does not emulate Layer 7 inspection, IPS, or advanced stateful firewall capabilities. These services are represented conceptually and would be implemented using Cisco Firepower, FortiGate, Palo Alto, or pfSense in a production environment or in GNS3/EVE-NG.
 ---
-
 ## 🧪 Verification & Testing Validation
 
 ### Automated Test Cases Matrix
