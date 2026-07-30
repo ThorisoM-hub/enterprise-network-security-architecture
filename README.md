@@ -179,7 +179,7 @@ Note: The Next-Generation Firewall (NGFW) shown in the topology is included as a
 
 - **Proposed Future GNS3 Framework Scalability:** While this Packet Tracer deployment perfectly validates the mathematical logic, addressing pools, and core traffic engineering choices, real-world scaling can be migrated into a GNS3 hypervisor cluster for advanced engineering evaluations. Moving this layout to GNS3 later allows a security engineer to replace logical router abstractions with true hardware kernel appliances (such as Cisco IOSv QEMU binaries and production-grade FortiGate stateful firewall operating systems). That evolution allows analysts to test real-world deep packet inspection (DPI), stateful tracking metrics, and raw syslog ingestion streams passing directly out of live Windows Server 2022 Core Domain Controller VMs and into live dockerized SIEM monitoring nodes (Elastic / Wazuh), elevating this network simulation into a real-world, high-fidelity security staging lab.
 
-     # GNS3 Future Enterprise Expansion Roadmap
+     ####     GNS3 Future Enterprise Expansion Roadmap
 
     * **Identity & Endpoints**: Deploys hybrid Windows Server 2022 AD DS/Microsoft Entra ID with automated PowerShell user provisioning (1,000+ users), strict GPO compliance, and cross-platform endpoints (Windows, Ubuntu, Kali).
     * **Perimeter & WAN**: Implements automated HQ-to-Branch SD-WAN architectures utilizing FortiGate, Palo Alto, and pfSense NGFWs with OSPF dynamic routing, dual ISP failover, and high-availability Site-to-Site IPsec VPNs.
