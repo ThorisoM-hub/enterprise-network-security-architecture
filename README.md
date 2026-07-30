@@ -372,6 +372,18 @@ Switch(config-if-range)# switchport port-security maximum 1
 Switch(config-if-range)# switchport port-security violation shutdown
 ```
 
+- **Network Security Controls & Architectural Alignments:** Deep expertise deploying infrastructure-level countermeasures to minimize attack surfaces and isolate critical assets:
+  - `VLAN Segmentation` -> Enforces broadcast isolation by logically dividing the local network to contain lateral threat movement.
+  - `Access Control Lists (ACLs)` -> Implements granular traffic filtering at layer-3 boundaries to permit or deny specific protocol streams.
+  - `DHCP (Dynamic Host Configuration Protocol)` -> Facilitates automated addressing and IP tracking across endpoints while enabling rogue mitigation strategies.
+  - `Port Security` -> Delivers rogue device prevention by binding specific physical switch ports to authorized MAC addresses.
+  - `Shutdown Unused Ports` -> Minimizes the physical attack surface by disabling inactive interfaces to block unauthorized hardware access.
+  - `Out-of-Band (OOB) Management` -> Secures infrastructure administration by separating network management traffic from public production data paths.
+  - `Demilitarized Zone (DMZ)` -> Ensures public server isolation, shielding the private corporate directory from internet-exposed applications.
+  - `Guest VLAN` -> Provisions restricted internet-only access for untrusted third-party endpoints, preventing internal network exposure.
+  - `IoT VLAN` -> Implements strict device isolation for smart hardware to contain vulnerabilities inherent in legacy or unpatched firmware.
+
+
 ## 🔐 Security Implementation Summary
 
 The network configuration transitions the operational footprint from a high-risk, flat architecture into a secure, hardened baseline. By embedding strict division strategies directly inside core switches and filtering transit layers via the Edge router, lateral pivoting threats are significantly minimized. Guests, peripheral IoT systems, and network printers remain fully siloed from core Active Directory identity directories and department file shares, preventing unauthorized privilege escalation and ensuring robust infrastructure defense.
