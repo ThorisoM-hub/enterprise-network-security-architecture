@@ -197,10 +197,11 @@ Note: The Next-Generation Firewall (NGFW) shown in the topology is included as a
   - `Out-of-Band (OOB) Management` -> Secures infrastructure administration by separating network management traffic from public production data paths.
   - `Demilitarized Zone (DMZ)` -> Ensures public server isolation, shielding the private corporate directory from internet-exposed applications.
   - `Guest VLAN` -> Provisions restricted internet-only access for untrusted third-party endpoints, preventing internal network exposure.
-  - `IoT VLAN` -> Implements strict device isolation for smart hardware to contain vulnerabilities inherent in legacy or unpatched firmware.
+  - `IoT VLAN` -> Implements strict device isolation for smart hardware to contain vulnerabilities inherent in legacy or unpatched 
 
 -  ***Enterprise Hardening Recommendations***
 
+    #### Infrastructure Security & Layer 2 Hardening
     * **BPDU Guard**: Disables PortFast-enabled access ports immediately if they receive unauthorized Spanning Tree Bridge Protocol Data Units, stopping rogue switch attachments.
     * **Root Guard**: Enforces the placement of the primary Root Bridge by preventing untrusted downstream switches from hijacking the Spanning Tree root position.
     * **Storm Control**: Monitors and suppresses excessive broadcast, multicast, or unicast traffic spikes on interfaces to eliminate network degradation and DoS conditions.
@@ -210,11 +211,28 @@ Note: The Next-Generation Firewall (NGFW) shown in the topology is included as a
     * **PortFast**: Optimizes access port initialization by bypassing standard listening/learning Spanning Tree states for authorized endpoints.
     * **Disable DTP**: Disables interface auto-negotiation (`switchport nonegotiate`) on access ports to block unauthorized VLAN hopping exploits.
     * **Disable CDP Externally**: Turns off Cisco Discovery Protocol on internet-facing or untrusted boundaries to limit infrastructure information disclosure.
+    * **Private VLANs**: Isolates Layer-2 communications between ports inside the same IP subnet boundary to eliminate unauthorized peer-to-peer traffic.
     * **SSH instead of Telnet**: Mandates encrypted Secure Shell (SSHv2) connections for all administrative command-line access, eliminating cleartext credential sniffing.
+
+    #### Network Access Control (NAC) & Trust Architectures
     * **Enable AAA**: Enforces centralized access control mechanisms to track administrative changes and authenticate operators.
+    * **Cisco AAA Authentication**: Centralizes administration controls utilizing TACACS+ for administrative terminal isolation and RADIUS (802.1X) for secure network access control.
+    * **Cisco ISE Integration**: Serves as the central security engine to orchestrate automated onboarding policies, threat containment, and dynamic port policies.
+    * **Network Access Control (NAC)**: Governs network access privileges by evaluating user credentials and validating endpoint posture baselines before granting link access.
+    * **Cisco TrustSec**: Embeds scalable group tags (SGTs) directly within network frames to scale access policies independently of traditional IP subnet parameters.
+
+    #### Telemetry & Operations Security
+    * **NetFlow Monitoring**: Collects granular traffic flow abstractions across physical boundaries to perform real-time visibility and anomaly detection tracking.
     * **NTP**: Synchronizes clocks across all active hardware to maintain log integrity, clock alignment, and accurate security incident timelines.
     * **Syslog**: Standardizes administrative event and security notification streaming out to a centralized SIEM or remote log analyzer.
     * **SNMPv3**: Secures network monitoring streams via cryptographic encryption, message authentication, and explicit access control lists.
+    * **Configuration Backup Automation**: Drives regular software state snapshots to verify quick disaster recovery execution and clear configuration auditing.
+
+    #### Core Infrastructure & Availability Services
+    * **HSRP First-Hop Redundancy**: Establishes high-availability default gateway clustering to guarantee transparent routing failover for active subnets.
+    * **EtherChannel**: Aggregates parallel physical links into unified logical channels to increase network bandwidth and handle immediate connection failures.
+    * **OSPF Dynamic Routing**: Coordinates path distribution mechanics systematically across networks to ensure fast path convergence and routing consistency.
+
 
 ## 🔐 Security Implementation Summary
 
