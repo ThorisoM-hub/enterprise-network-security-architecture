@@ -77,33 +77,6 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
 *   **Boundary Enforcement:** Firewalls, Edge Routers, and Layer 2/3 Switch boundaries are drawn to map **East-West lateral movement controls** via stateless Extended Access Control Lists (ACLs) applied directly to subinterfaces.
 
 ---
-### Integrated Incident Response and Forensic Readiness
-
-A key design objective of this architecture is enabling rapid incident investigation through the correlation of physical and digital evidence. Rather than treating CCTV infrastructure as an isolated security system, surveillance data forms part of the wider enterprise security monitoring strategy.
-
-When a security event occurs, SOC analysts can correlate across dimensions:
-
-| Digital Evidence | Physical Evidence |
-| :--- | :--- |
-| **Authentication logs** | CCTV recordings |
-| **Syslog events** | Door access events |
-| **ACL log entries** | Camera footage |
-| **VPN activity** | Building entry records |
-| **DHCP leases** | Physical movement timelines |
-
-Because the SIEM platform (VLAN 30) and CCTV infrastructure (VLAN 50) are interconnected through controlled routing and ACL enforcement, investigators can construct a synchronized timeline of events.
-
-* **Real-World Correlation Example**: A brute-force authentication attempt detected on a production server can immediately be correlated with recorded access to the server room or restricted office areas during the same time period.
-
-This model significantly improves organizational capabilities across multiple tracks:
-* **Incident Response (IR)**: Decreases mean time to identify and contain anomalies.
-* **Digital Forensics**: Accelerates chain of custody mapping and analytical timelines.
-* **Insider Threat Investigations**: Pinpoints unauthorized operational access points.
-* **Evidence Preservation**: Seals system snapshots alongside video verification assets.
-* **Security Operations Centre (SOC) Effectiveness**: Drives comprehensive operational context for analysts.
-
-The architecture therefore demonstrates the integration of cybersecurity operations with physical security, reflecting practices commonly implemented in enterprise environments.
-
 
 ---
 ## 🎛️ Physical Server Room & Rack Architecture Mapping
@@ -326,29 +299,66 @@ Identity-Centric Security
 *Authentication services are centralized through Active Directory, allowing identity to become the primary trust anchor rather than network location alone.
 
 ---
+### Integrated Incident Response and Forensic Readiness
+
+A key design objective of this architecture is enabling rapid incident investigation through the correlation of physical and digital evidence. Rather than treating CCTV infrastructure as an isolated security system, surveillance data forms part of the wider enterprise security monitoring strategy.
+
+When a security event occurs, SOC analysts can correlate across dimensions:
+
+| Digital Evidence | Physical Evidence |
+| :--- | :--- |
+| **Authentication logs** | CCTV recordings |
+| **Syslog events** | Door access events |
+| **ACL log entries** | Camera footage |
+| **VPN activity** | Building entry records |
+| **DHCP leases** | Physical movement timelines |
+
+Because the SIEM platform (VLAN 30) and CCTV infrastructure (VLAN 50) are interconnected through controlled routing and ACL enforcement, investigators can construct a synchronized timeline of events.
+
+* **Real-World Correlation Example**: A brute-force authentication attempt detected on a production server can immediately be correlated with recorded access to the server room or restricted office areas during the same time period.
+
+This model significantly improves organizational capabilities across multiple tracks:
+* **Incident Response (IR)**: Decreases mean time to identify and contain anomalies.
+* **Digital Forensics**: Accelerates chain of custody mapping and analytical timelines.
+* **Insider Threat Investigations**: Pinpoints unauthorized operational access points.
+* **Evidence Preservation**: Seals system snapshots alongside video verification assets.
+* **Security Operations Centre (SOC) Effectiveness**: Drives comprehensive operational context for analysts.
+
+The architecture therefore demonstrates the integration of cybersecurity operations with physical security, reflecting practices commonly implemented in enterprise environments.
+
+---
 ### 📈 Security Validation,  Testing & ACL Verification Matrix
 
 The following validation tests were performed to confirm that inter-VLAN routing and Extended ACL policies enforce the intended security boundaries. Each scenario verifies that only explicitly authorized traffic is permitted while unauthorized communications are denied and logged. This updated grid combines all legacy testing scenarios, source-to-destination logic tracking metrics, and explicit security test cases into a single unified auditing matrix.
 
 | Test ID | Source Node / Zone | Destination Node / Zone | Protocol / Port | Expected Result | Verification Status | Security Rationale / Objective |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **TC-01** | Guest Kiosk PC (192.168.40.10) / Guest | Active Directory Domain Controller (192.168.30.100) / Internal Networks | ICMP / Any | **Blocked & Logged** | ✅ Verified / Closed | Protect identity infrastructure; Prevents guest users from discovering or probing internal directory infrastructure. |
-| **TC-02** | Guest Kiosk PC (192.168.40.10) / Guest | Internet Gateway / External DNS | UDP 53 (DNS) | **Permitted** | ✅ Verified / Closed | Permit controlled internet access; Allows guests to resolve internet domain names while maintaining isolation from corporate resources. |
-| **TC-03** | CCTV NVR (192.168.50.25) / IoT | HR File Server (192.168.20.60) / Internal Networks | TCP 445 (SMB) | **Blocked & Logged** | ✅ Verified / Closed | Prevent IoT lateral movement; Prevents compromised surveillance systems from moving laterally into production file services. |
-| **TC-04** | CCTV NVR (192.168.50.25) / IoT | SIEM Log Collector (192.168.30.200) / Internal Networks | UDP 514 (Syslog) | **Permitted** | ✅ Verified / Closed | Enable centralized logging; Enables centralized logging and continuous SOC monitoring of surveillance infrastructure. |
-| **TC-05** | Network Admin PC (192.168.99.100) / OOB Management | Core Switch Management Interface (192.168.99.1) / Network Devices | TCP 22 (SSH) | **Permitted** | ✅ Verified / Closed | Secure management access; Allows secure out-of-band administration from the dedicated management VLAN only (Administrative control). |
-| **TC-06** | Finance PC (192.168.10.15) / Finance | Core Switch Management Interface (192.168.99.1) / Management VLAN | TCP 22 (SSH) | **Blocked & Logged** | ✅ Verified / Closed | Restrict administrative access; Restricts infrastructure management access to authorized administrators operating within VLAN 99. |
-| **TC-07** | SOC Security Scanner (192.168.30.50) / IT | Finance Subnet (192.168.10.0/24) / All VLANs | IP / Any | **Permitted** | ✅ Verified / Closed | Permit authorized security assessments; Allows authorized vulnerability assessments and administrative operations across production networks. |
-| **TC-08** | Guest Smartphone (Corporate-Guest SSID) | Finance File Server (192.168.10.60) | TCP 445 (SMB) | **Blocked & Logged** | ✅ Verified / Closed | Corporate isolation; Ensures guest wireless devices cannot access internal file-sharing resources. |
-| **TC-09** | IT Administrator PC (192.168.30.x) / IT | CCTV NVR (192.168.50.25) / All VLANs | HTTPS 443 | **Permitted** | ✅ Verified / Closed | Administrative responsibilities; Allows authorized administrators to securely manage surveillance infrastructure. |
-| **TC-10** | Wireless CCTV Camera | CCTV NVR (192.168.50.25) | RTSP 554 / HTTPS 443 | **Permitted** | ✅ Verified / Closed | Device containment; Allows secure transmission of surveillance video to the recording platform within the local IoT zone. |
-| **TC-11** | IoT Device (VLAN 50) / IoT | Internet / Internal Networks | Any | **Blocked & Logged** | ✅ Verified / Closed | Corporate isolation; Prevents unmanaged IoT devices from initiating unauthorized outbound or internal communications. |
-| **TC-12** | Finance PC (192.168.10.x) / Finance | Finance Server (192.168.10.60) | SMB TCP 445 | **Permitted** | ✅ Verified / Closed | Departmental operations; Confirms legitimate departmental access to shared financial resources. |
-| **TC-13** | HR PC (192.168.20.x) / HR | Finance File Server (192.168.10.60) / IT Network | SMB TCP 445 / Any | **Blocked & Logged** | ✅ Verified / Closed | Enforces departmental segregation, workstation isolation, and strict least-privilege access controls. |
-| **TC-14** | Executive Smartphone (Corporate-Secure SSID) / Executive | Active Directory Domain Controller / Finance Server | Kerberos TCP/UDP 88, LDAP 389 / Any | **Permitted** | ✅ Verified / Closed | Executive oversight; Verifies secure enterprise authentication and executive asset access for authorized mobile users. |
-| **TC-15** | Any Unauthorized Host / Executive | Restricted VLAN / Finance PCs | Any | **Blocked & Logged** | ✅ Verified / Closed | Workstation isolation / Implicit Deny; Confirms implicit deny policy and generation of security telemetry for unauthorized lateral access attempts. |
-| **TC-16** | HR PC (192.168.20.x) / HR | HR Servers | Any | **Permitted** | ✅ Verified / Closed | Local department access; Ensures local personnel can access designated infrastructure components. |
-| **TC-17** | DMZ Zone | Internal LAN | Any | **Blocked & Logged** | ✅ Verified / Closed | Public server isolation; Hardens the boundary by ensuring DMZ systems cannot establish unapproved internal socket connections. |
+| **TC-01** | Guest Kiosk PC (192.168.40.10) / Guest | Active Directory Domain Controller (192.168.30.100) / Internal Networks | ICMP / Any | **Blocked & Logged** | ✅ Verified / Closed | Protect identity infrastructure; Prevents guest users from discovering or probing internal directory infrastructure. *Example*: A guest user opening a command prompt and typing `ping 192.168.30.100` receives a "Request timed out" error as the router interface drops the packets. |
+| **TC-02** | Guest Kiosk PC (192.168.40.10) / Guest | Internet Gateway / External DNS | UDP 53 (DNS) | **Permitted** | ✅ Verified / Closed | Permit controlled internet access; Allows guests to resolve internet domain names while maintaining isolation from corporate resources. *Example*: A guest opening a browser to search the web triggers successful background UDP port 53 traffic out to an open resolver like `8.8.8.8`. |
+| **TC-03** | CCTV NVR (192.168.50.25) / IoT | HR File Server (192.168.20.60) / Internal Networks | TCP 445 (SMB) | **Blocked & Logged** | ✅ Verified / Closed | Prevent IoT lateral movement; Prevents compromised surveillance systems from moving laterally into production file services. *Example*: If an attacker gains a foothold on the video recorder and scripts a file-share scan via `net use \\192.168.20.60\shares`, the TCP socket handshake is immediately terminated by the ACL gateway rules. |
+| **TC-04** | CCTV NVR (192.168.50.25) / IoT | SIEM Log Collector (192.168.30.200) / Internal Networks | UDP 514 (Syslog) | **Permitted** | ✅ Verified / Closed | Enable centralized logging; Enables centralized logging and continuous SOC monitoring of surveillance infrastructure. *Example*: The camera platform sends automated, structured syslog status alerts natively over port 514 directly into the security team's central monitoring dashboard dashboard. |
+| **TC-05** | Network Admin PC (192.168.99.100) / OOB Management | Core Switch Management Interface (192.168.99.1) / Network Devices | TCP 22 (SSH) | **Permitted** | ✅ Verified / Closed | Secure management access; Allows secure out-of-band administration from the dedicated management VLAN only (Administrative control). *Example*: An engineer opening an admin console via PuTTY or terminal to run `ssh admin@192.168.99.1` successfully prompts a secure cryptographic login interface. |
+| **TC-06** | Finance PC (192.168.10.15) / Finance | Core Switch Management Interface (192.168.99.1) / Management VLAN | TCP 22 (SSH) | **Blocked & Logged** | ✅ Verified / Closed | Restrict administrative access; Restricts infrastructure management access to authorized administrators operating within VLAN 99. *Example*: An employee at a desk in the finance department running an SSH connection client to access core systems receives a "Connection refused" or terminal timeout message. |
+| **TC-07** | SOC Security Scanner (192.168.30.50) / IT | Finance Subnet (192.168.10.0/24) / All VLANs | IP / Any | **Permitted** | ✅ Verified / Closed | Permit authorized security assessments; Allows authorized vulnerability assessments and administrative operations across production networks. *Example*: An internal security scanning suite executes network wide profiling, sweeping across the corporate IP pools to flag unpatched services safely. |
+| **TC-08** | Guest Smartphone (Corporate-Guest SSID) | Finance File Server (192.168.10.60) | TCP 445 (SMB) | **Blocked & Logged** | ✅ Verified / Closed | Corporate isolation; Ensures guest wireless devices cannot access internal file-sharing resources. *Example*: A visitor trying to connect their personal device to the local finance accounting storage share directory hits an immediate access restriction wall. |
+| **TC-09** | IT Administrator PC (192.168.30.x) / IT | CCTV NVR (192.168.50.25) / All VLANs | HTTPS 443 | **Permitted** | ✅ Verified / Closed | Administrative responsibilities; Allows authorized administrators to securely manage surveillance infrastructure. *Example*: A network engineer logs safely into the secure management dashboard of the recording system by typing `https://192.168.50.25` into an authorized workstation browser. |
+| **TC-10** | Wireless CCTV Camera | CCTV NVR (192.168.50.25) | RTSP 554 / HTTPS 443 | **Permitted** | ✅ Verified / Closed | Device containment; Allows secure transmission of surveillance video to the recording platform within the local IoT zone. *Example*: A digital physical security camera records a clip and streams continuous real-time video feeds down to the server room storage unit over standard streaming ports. |
+| **TC-11** | IoT Device (VLAN 50) / IoT | Internet / Internal Networks | Any | **Blocked & Logged** | ✅ Verified / Closed | Corporate isolation; Prevents unmanaged IoT devices from initiating unauthorized outbound or internal communications. *Example*: An smart appliance attempting to reach out to an external unknown domain server or public IP address is blocked and flagged in the network telemetry engine. |
+| **TC-12** | Finance PC (192.168.10.x) / Finance | Finance Server (192.168.10.60) | SMB TCP 445 | **Permitted** | ✅ Verified / Closed | Departmental operations; Confirms legitimate departmental access to shared financial resources. *Example*: An accounting staff member seamlessly opens a shared spreadsheet on the departmental server room storage volume to complete a weekly ledger check. |
+| **TC-13** | HR PC (192.168.20.x) / HR | Finance File Server (192.168.10.60) / IT Network | SMB TCP 445 / Any | **Blocked & Logged** | ✅ Verified / Closed | Enforces departmental segregation, workstation isolation, and strict least-privilege access controls. *Example*: A human resources team member trying to link directly to the finance ledger shared space is blocked by a Windows file permission and network pathway block. |
+| **TC-14a** | Executive Smartphone (Corporate-Secure SSID) / Executive | Active Directory Domain Controller (192.168.30.100) / IT | Kerberos TCP/UDP 88, LDAP 389 | **Permitted** | ✅ Verified / Closed | Centralized Identity Validation; Verifies secure enterprise authentication for authorized mobile users. *Example*: A company director signs into their mobile portal, prompting an automated Kerberos handshake over port 88 with the domain controller to unlock corporate services. |
+| **TC-14b** | Executive Smartphone (Corporate-Secure SSID) / Executive | Finance Server (192.168.10.60) / Finance | Any | **Blocked & Logged** | ✅ Verified / Closed | Executive Exploitation Prevention; Enforces strict role-based isolation by ensuring that even high-privilege executive mobile devices cannot establish direct connections to raw financial data volumes. *Example*: A director attempting to map a network drive from their smartphone directly to the finance database is blocked at the gateway, forcing financial reporting to occur through secure application intermediaries. |
+| **TC-15** | Any Unauthorized Host / Executive | Restricted VLAN / Finance PCs | Any | **Blocked & Logged** | ✅ Verified / Closed | Workstation isolation / Implicit Deny; Confirms implicit deny policy and generation of security telemetry for unauthorized lateral access attempts. *Example*: An unauthorized device plugged into a generic office drop trying to scan standard company desktops fails to receive any network interface responses. |
+| **TC-16** | HR PC (192.168.20.x) / HR | HR Servers | Any | **Permitted** | ✅ Verified / Closed | Local department access; Ensures local personnel can access designated infrastructure components. *Example*: A recruiter accesses a staff record tracking profile residing securely on a local departmental processing machine. |
+| **TC-17** | DMZ Zone | Internal LAN | Any | **Blocked & Logged** | ✅ Verified / Closed | Public server isolation; Hardens the boundary by ensuring DMZ systems cannot establish unapproved internal socket connections. *Example*: A web server inside the DMZ zone that gets exploited by an external attacker tries to execute a shell script targeting internal databases but is blocked instantly at the DMZ perimeter wall. |
+| **TC-18** | HR PC (192.168.20.15) / HR | Finance PC (192.168.10.15) / Finance | Any | **Blocked & Logged** | ✅ Verified / Closed | Workstation isolation; Prevents host-to-host lateral traversal across separate corporate subnets to stop malware propagation. *Example*: If Sarah in HR tries to map a network drive or send a file directly to Mike's computer screen in Finance by typing `\\192.168.10.15`, the router immediately drops the request, showing a "Network path not found" message. |
+| **TC-19** | Finance PC (192.168.10.15) / Finance | IT Administrator PC (192.168.30.25) / IT | Any | **Blocked & Logged** | ✅ Verified / Closed | Endpoint hardening; Restricts standard corporate nodes from interacting directly with technical administrative endpoints. *Example*: A finance department workstation attempting to open a direct remote control command line window or connection straight to an IT desk machine is dropped by the subinterface filters. |
+| **TC-20** | Executive PC (192.168.15.10) / Executive | Guest Kiosk PC (192.168.40.10) / Guest | Any | **Blocked & Logged** | ✅ Verified / Closed | Data loss prevention; Restricts sensitive internal workstations from engaging in raw socket traffic with untrusted public terminals. *Example*: A laptop on the executive corporate subnet attempting to link directly to a standard untrusted customer terminal inside the lobby is systematically denied at the gateway. |
+| **TC-21** | Finance PC (192.168.10.x) / Finance | HR PC (192.168.20.x) / HR | Any | **Blocked & Logged** | ✅ Verified / Closed | Lateral Movement Prevention; Direct peer-to-peer connection is denied to halt ransomware outbreaks. Business functions occur safely via intermediate servers. *Example*: A malware infection on a Finance desk PC trying to blast malicious code over to the HR department office floor is completely blocked, keeping the HR floor isolated. |
+| **TC-22** | Finance PC (192.168.10.x) / Finance | HR File Server (192.168.20.60) / HR | SMB TCP 445 | **Permitted** | ✅ Verified / Closed | Secure Collaborative Intermediary; Allows Finance endpoints to communicate with the central HR File Server for shared documents, bypassing user-to-user channels. *Example*: A Finance specialist securely mounts the central `\\192.168.20.60\payroll` repository folder to gather approved operational worksheets. |
+| **TC-23** | Finance PC (192.168.10.x) / Finance | IT Subnet (192.168.30.x) / IT | Any | **Blocked & Logged** | ✅ Verified / Closed | Zero-Trust Operations; Direct host-to-host sessions are blocked to prevent insider threats. Technical troubleshooting and contacting IT support are handled safely through a central web-based ticketing system (HTTPS port 443) rather than direct peer connections. *Example*: An employee needing technical help opens a support ticket via the portal; support tools manage the connection securely from a monitored room. |
+| **TC-24** | Finance PC (192.168.10.x) / Finance | Active Directory Domain Controller (192.168.30.100) / IT | Kerberos 88, LDAP 389/636, DNS 53 | **Permitted** | ✅ Verified / Closed | Centralized Identity Architecture; Permitted via strict filtering for enterprise operations. Standard Finance PCs communicate with AD for user authentication, LDAP lookups, and requesting **Kerberos network access tickets** (cryptographic tokens to access network resources, **not** IT helpdesk support tickets). *Example*: When an accountant signs in, the local machine queries the central AD server over port 88 to verify credentials and issue security tokens to unlock the desktop session. |
+| **TC-25** | Authorized Admin PCs / IT & Management Subnets | All Internal Networks / Enterprise Infrastructure | Any / All Ports | **Permitted** | ✅ Verified / Closed | Universal administrative oversight; Permits authorized system administrators full operational access across corporate zones to perform maintenance, updates, and emergency remediation. *Example*: An IT admin logging in from an authorized jump box connects to a production server subnet to deploy routine security patches. |
 
 
 📈 Validation Methodology
