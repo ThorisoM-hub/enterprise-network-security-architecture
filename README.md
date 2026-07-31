@@ -26,6 +26,10 @@ Primary Objectives
 - **Access Control Lists (ACLs) Traffic Policy Enforcement:** Employs Extended ACLs on layer 3 ingress processing points to drop malicious or unapproved connection parameters based on explicitly defined corporate rules.
 
 - **DHCP Scopes Configuration Automations:** Streamlines organizational architecture expansion and reduces user misconfigurations by writing adaptive multi-pool lease structures mapping internal DNS pathways to central identity servers.
+  
+- **Enforcement of Least Privilege**: Restricts inter-departmental traffic flows to the absolute minimum network paths required for core business operations, applying an explicit "deny-by-default" security posture to block unauthorized cross-VLAN communication and eliminate unnecessary lateral attack surfaces.
+
+   *Example*: An accountant in the Finance department needs access to the Finance Server to run payroll, but they have zero operational need to connect to devices in the HR or IT networks. Conversely, while an IT administrator needs full administrative access to all networks, an HR user should be restricted entirely from reaching the IT management subnet. A least-privilege Extended ACL blocks these unnecessary cross-departmental connections, instantly trapping any potential threat within its starting boundary.
 
 - **Role-Based Access Control (RBAC) Architecture:** Access parameters map entirely to business assignments (Finance, HR, IT, Guest), displaying a firm grasp of Identity Access Management alignment.
 - **OSI Model Mapping & Layered Traffic Flow:** Integrates end-to-end data encapsulation and decapsulation across the 7-tier model during enterprise transit—managing Layer 2 MAC addresses and 802.1Q trunking, Layer 3 IP subinterface routing and Extended ACL filtering, Layer 4 TCP connection state tracking for stateful firewalls, and Layer 7 deep packet inspection alongside DHCP D.O.R.A. handshakes.
@@ -44,6 +48,14 @@ Primary Objectives
   - `show arp` -> Inspects the local Address Resolution Protocol cache mapping logical IPs to physical destinations.
 
 - **SOC Infrastructure Visibility & System Monitoring Mindset:** Architectural separation accounts for unified visibility mapping, incorporating dedicated Active Directory authentication monitoring and SOC log collection points to verify analytical tracking.
+### 🌐 Core Technologies & Architecture Matrix
+
+| Layer 2 Segments & Fabric | Layer 3 Routing & Services | Defense-in-Depth & Design |
+| :--- | :--- | :--- |
+| • **VLAN Architecture** <br>• **IEEE 802.1Q Trunking** <br>• **Layer 2 Segmentation** <br>• **Secure Wireless Segmentation** | • **Router-on-a-Stick** <br>• **Inter-VLAN Routing** <br>• **DHCP Services** <br>• **Layer 3 Routing** | • **Extended ACLs** <br>• **Defense in Depth** <br>• **Identity-Aware Network Design** <br>• **DMZ Architecture** <br>• **Network Hardening** <br>• **Infrastructure Documentation** <br>• **Enterprise Network Planning** |
+
+
+
 
 ## 🏢 Architectural Realities: Physical vs. Logical Deployment
 
@@ -65,7 +77,35 @@ Inside Cisco Packet Tracer, the layout is organized purely by network security z
 *   **Boundary Enforcement:** Firewalls, Edge Routers, and Layer 2/3 Switch boundaries are drawn to map **East-West lateral movement controls** via stateless Extended Access Control Lists (ACLs) applied directly to subinterfaces.
 
 ---
+### Integrated Incident Response and Forensic Readiness
 
+A key design objective of this architecture is enabling rapid incident investigation through the correlation of physical and digital evidence. Rather than treating CCTV infrastructure as an isolated security system, surveillance data forms part of the wider enterprise security monitoring strategy.
+
+When a security event occurs, SOC analysts can correlate across dimensions:
+
+| Digital Evidence | Physical Evidence |
+| :--- | :--- |
+| **Authentication logs** | CCTV recordings |
+| **Syslog events** | Door access events |
+| **ACL log entries** | Camera footage |
+| **VPN activity** | Building entry records |
+| **DHCP leases** | Physical movement timelines |
+
+Because the SIEM platform (VLAN 30) and CCTV infrastructure (VLAN 50) are interconnected through controlled routing and ACL enforcement, investigators can construct a synchronized timeline of events.
+
+* **Real-World Correlation Example**: A brute-force authentication attempt detected on a production server can immediately be correlated with recorded access to the server room or restricted office areas during the same time period.
+
+This model significantly improves organizational capabilities across multiple tracks:
+* **Incident Response (IR)**: Decreases mean time to identify and contain anomalies.
+* **Digital Forensics**: Accelerates chain of custody mapping and analytical timelines.
+* **Insider Threat Investigations**: Pinpoints unauthorized operational access points.
+* **Evidence Preservation**: Seals system snapshots alongside video verification assets.
+* **Security Operations Centre (SOC) Effectiveness**: Drives comprehensive operational context for analysts.
+
+The architecture therefore demonstrates the integration of cybersecurity operations with physical security, reflecting practices commonly implemented in enterprise environments.
+
+
+---
 ## 🎛️ Physical Server Room & Rack Architecture Mapping
 
 The section below maps the logical topology directly onto physical corporate infrastructure units housed within the IT Operations room datacenter frame, visualizing the containment boundaries and edge endpoints:
@@ -83,6 +123,25 @@ The section below maps the logical topology directly onto physical corporate inf
   * 🔒 **Hardened DMZ Production Segment:** Hosts public-facing corporate infrastructure elements within VLAN 100, isolated fully from trusted user tiers to terminate exterior requests safely.
 * **⚡ High-Availability Power Layer:** A dedicated, rack-mounted UPS (Uninterruptible Power Supply) backup system is installed at the framework foundation, ensuring continuous runtime, clean power conditioning, and operational resilience for the core security infrastructure during local power fluctuations or load-shedding events.
 * **Vulnerability Management Baseline Enforcement:** 100% of unused physical switch ports and interface slots are administratively shut down (`shutdown`) to mitigate rogue network access vectors or physical bypass attacks.
+
+---
+### Physical Infrastructure Inventory
+
+The logical topology maps directly onto enterprise-grade hardware commonly deployed within secured server rooms.
+
+| Device | Example Hardware |
+| :--- | :--- |
+| **Edge Router** | Cisco 2911 ISR |
+| **Core Switch** | Cisco Catalyst 2960 |
+| **Firewall** | Cisco Firepower / FortiGate / Palo Alto (Conceptual) |
+| **Wireless Access Point** | Cisco Aironet Series |
+| **Active Directory Server** | Windows Server 2022 |
+| **SIEM / Log Collector** | Windows or Linux Server |
+| **CCTV NVR** | Dedicated Rack-mounted NVR Appliance |
+| **UPS** | Rack-mounted Online UPS |
+| **Patch Panels** | 24/48 Port Cat6 Patch Panels |
+
+This inventory represents a realistic deployment model and bridges the logical Packet Tracer topology with enterprise physical infrastructure.
 
 ---
 ## 📡 Enterprise Multi-SSID Wireless Infrastructure Matrix
@@ -104,6 +163,29 @@ To align with your updated department mapping and extend role-based network cont
 
 A corporate office requires an internal network restructure to secure its operational workflows. The environment hosts eight distinct subnets, each mapped to a specific corporate function and data tier. The security policy mandates granular boundary protections to prevent unauthorized internal communication, focusing heavily on lateral movement reduction.
 
+🌐 IP Addressing Strategy
+
+The enterprise network follows a structured private IPv4 addressing scheme using RFC1918 address space.
+
+Each department receives its own dedicated /24 subnet, providing:
+* Simplified troubleshooting
+* Clear security boundaries
+* Easier ACL implementation
+* Reduced broadcast traffic
+* Scalable future expansion
+
+Gateway addressing follows a consistent convention where the first usable address (.1) serves as the default gateway for every VLAN.
+
+Static IP addressing is reserved for infrastructure components including:
+* Domain Controllers
+* File Servers
+* Application Servers
+* Network Printers
+* CCTV Infrastructure
+* Core Management Devices
+
+Dynamic addressing is provided exclusively through centralized DHCP pools.
+---
 ### VLAN & Access Policy Table
 
 | VLAN ID | Department | Gateway IP | Subnet Mask | Access Policy | Plain-English Explanation |
@@ -136,6 +218,57 @@ To maximize enterprise accuracy, our datacenter zone maps dedicated functional s
 * **DMZ Public Web Server:** `192.168.100.30` (VLAN 100) – Hosts the primary external storefront and corporate web assets.
 * **DMZ Hardened SFTP Server:** `192.168.100.40` (VLAN 100) – Validates encrypted external client file transfers.
 ---
+---
+🔀 Traffic Flow Through the Enterprise
+
+Every packet entering the network follows a predictable security path.
+
+```text
+End Device
+    │
+    ▼
+Access Port / Wireless SSID
+    │
+    ▼
+Layer 2 Switch
+    │
+    ▼
+802.1Q Trunk
+    │
+    ▼
+Router Subinterface
+    │
+    ▼
+ACL Evaluation
+    │
+    ▼
+Routing Decision
+    │
+    ▼
+Destination VLAN
+```
+
+For internet-bound traffic, packets are forwarded toward the NGFW before exiting the enterprise boundary where stateful inspection, IPS, and application-layer inspection occur.
+🧠 East-West vs North-South Traffic
+
+This project intentionally separates internal and external security responsibilities.
+
+#### East-West Traffic
+Traffic moving between internal VLANs. Examples include:
+* **Finance → HR**
+* **HR → IT**
+* **Executive → Finance**
+
+These flows are controlled through Extended ACLs applied to Router-on-a-Stick subinterfaces.
+
+#### North-South Traffic
+Traffic entering or leaving the corporate network. Examples include:
+* **Employee browsing**
+* **VPN traffic**
+* **Public website access**
+* **Email**
+
+These flows are protected by the NGFW through stateful inspection, IPS, and Layer 7 application control.
 
 🔄 The Automated Handshake: How Devices Get an IP (D.O.R.A.)
 
@@ -163,23 +296,81 @@ Note: The Next-Generation Firewall (NGFW) shown in the topology is included as a
 * **Stateful Inspection vs. Stateless ACLs:** Unlike standard stateless ACL router controls that filter blindly on individual packet headers, the perimeter firewall enforces stateful inspection policies. It tracks active TCP connection handshakes originating from high-privilege corporate workstations (Exec Suites, Finance) out toward external web entities, ensuring returning traffic is strictly validated and linked to a verified, established internal session.
 * **Application-Layer Visibility (Layer 7 Defense):** The perimeter layer leverages deep packet inspection (DPI) to stop protocol-abuse attacks. If an asset inside the Executive Suite or HR network attempts to tunnel unapproved traffic or run malicious software over standard web ports (such as masking data exfiltration over Port 80 or 443), the firewall's application identification capabilities flag and neutralize the session immediately.
 * **Integrated Intrusion Prevention Systems (IPS):** The firewall runs dynamic signature matching engines to detect active exploitation attempts, software vulnerabilities, or network-layer scanning sequences targeting the internal corporate environment, generating telemetry drops directly to the security operations center (SOC) log collector.
+
 ---
-## 🧪 Verification & Testing Validation
+🔐 Enterprise Security Principles Applied
 
-### Automated Test Cases Matrix
+The architecture follows several internationally recognized cybersecurity principles.
 
-| Test Case ID | Traffic Source Host | Destination Target | Target Resource / Port | Expected Behavior | Verification Status |
-|---|---|---|---|---|---|
-| TC-01a | Guest Kiosk PC (Wired) | Finance / Admin PC | ICMP Echo Request (ping) | Blocked (Implicit Drop) | ✅ Verified / Closed |
-| TC-01b | Guest SmartPhone (Wi-Fi) | Finance Server Host | HTTP / Port 80, 443 | Blocked (ACL Boundary) | ✅ Verified / Closed |
-| TC-02 | Admin Endpoint (192.168.15.X) | Finance Database Server | Host IP (192.168.10.50) | ALLOWED (Shared Executive Access) | ✅ Verified / Closed |
-| TC-03 | HR Professional (192.168.20.X) | HR Department File Server | Host IP (192.168.20.60) | Allowed (Localized Access) | ✅ Verified / Closed |
-| TC-04 | Security / IT Admin (192.168.30.X) | Active Directory Server | Host IP (192.168.30.100) | Allowed (IAM Direct Control) | ✅ Verified / Closed |
-| TC-05 | Network MFP Printer (IoT On Fa0/10) | Internal Subnets (192.168.X.X) | Outbound System Pivot | Blocked (IoT Quarantine Rule) | ✅ Verified / Closed |
-| TC-06 | Unauthorized Tiers | Switch SVIs / OOBM Tiers | VTY Management Console | Blocked (OOBM Isolation Control) | ✅ Verified / Closed |
-| TC-07 | DMZ Public Servers | Core Enterprise Intranet | Internal Host Segments | Blocked (DMZ Containment Matrix) | ✅ Verified / Closed |
+Defense in Depth
+Security controls exist at multiple layers including:
+* VLAN Segmentation
+* ACL Filtering
+* Stateful Firewall Inspection
+* DMZ Isolation
+* Identity Management
+* Physical Network Separation
+
+Least Privilege
+Users and departments receive only the minimum network access required to perform business functions.
+
+Zero Trust Philosophy
+* No subnet automatically trusts another subnet.
+* Every communication path must be explicitly permitted.
+
+Segmentation
+* Each department operates inside its own isolated broadcast domain.
+* Even internal users must satisfy routing and ACL policy before communication is allowed.
+
+Identity-Centric Security
+*Authentication services are centralized through Active Directory, allowing identity to become the primary trust anchor rather than network location alone.
+
+---
+### 📈 Security Validation,  Testing & ACL Verification Matrix
+
+The following validation tests were performed to confirm that inter-VLAN routing and Extended ACL policies enforce the intended security boundaries. Each scenario verifies that only explicitly authorized traffic is permitted while unauthorized communications are denied and logged. This updated grid combines all legacy testing scenarios, source-to-destination logic tracking metrics, and explicit security test cases into a single unified auditing matrix.
+
+| Test ID | Source Node / Zone | Destination Node / Zone | Protocol / Port | Expected Result | Verification Status | Security Rationale / Objective |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **TC-01** | Guest Kiosk PC (192.168.40.10) / Guest | Active Directory Domain Controller (192.168.30.100) / Internal Networks | ICMP / Any | **Blocked & Logged** | ✅ Verified / Closed | Protect identity infrastructure; Prevents guest users from discovering or probing internal directory infrastructure. |
+| **TC-02** | Guest Kiosk PC (192.168.40.10) / Guest | Internet Gateway / External DNS | UDP 53 (DNS) | **Permitted** | ✅ Verified / Closed | Permit controlled internet access; Allows guests to resolve internet domain names while maintaining isolation from corporate resources. |
+| **TC-03** | CCTV NVR (192.168.50.25) / IoT | HR File Server (192.168.20.60) / Internal Networks | TCP 445 (SMB) | **Blocked & Logged** | ✅ Verified / Closed | Prevent IoT lateral movement; Prevents compromised surveillance systems from moving laterally into production file services. |
+| **TC-04** | CCTV NVR (192.168.50.25) / IoT | SIEM Log Collector (192.168.30.200) / Internal Networks | UDP 514 (Syslog) | **Permitted** | ✅ Verified / Closed | Enable centralized logging; Enables centralized logging and continuous SOC monitoring of surveillance infrastructure. |
+| **TC-05** | Network Admin PC (192.168.99.100) / OOB Management | Core Switch Management Interface (192.168.99.1) / Network Devices | TCP 22 (SSH) | **Permitted** | ✅ Verified / Closed | Secure management access; Allows secure out-of-band administration from the dedicated management VLAN only (Administrative control). |
+| **TC-06** | Finance PC (192.168.10.15) / Finance | Core Switch Management Interface (192.168.99.1) / Management VLAN | TCP 22 (SSH) | **Blocked & Logged** | ✅ Verified / Closed | Restrict administrative access; Restricts infrastructure management access to authorized administrators operating within VLAN 99. |
+| **TC-07** | SOC Security Scanner (192.168.30.50) / IT | Finance Subnet (192.168.10.0/24) / All VLANs | IP / Any | **Permitted** | ✅ Verified / Closed | Permit authorized security assessments; Allows authorized vulnerability assessments and administrative operations across production networks. |
+| **TC-08** | Guest Smartphone (Corporate-Guest SSID) | Finance File Server (192.168.10.60) | TCP 445 (SMB) | **Blocked & Logged** | ✅ Verified / Closed | Corporate isolation; Ensures guest wireless devices cannot access internal file-sharing resources. |
+| **TC-09** | IT Administrator PC (192.168.30.x) / IT | CCTV NVR (192.168.50.25) / All VLANs | HTTPS 443 | **Permitted** | ✅ Verified / Closed | Administrative responsibilities; Allows authorized administrators to securely manage surveillance infrastructure. |
+| **TC-10** | Wireless CCTV Camera | CCTV NVR (192.168.50.25) | RTSP 554 / HTTPS 443 | **Permitted** | ✅ Verified / Closed | Device containment; Allows secure transmission of surveillance video to the recording platform within the local IoT zone. |
+| **TC-11** | IoT Device (VLAN 50) / IoT | Internet / Internal Networks | Any | **Blocked & Logged** | ✅ Verified / Closed | Corporate isolation; Prevents unmanaged IoT devices from initiating unauthorized outbound or internal communications. |
+| **TC-12** | Finance PC (192.168.10.x) / Finance | Finance Server (192.168.10.60) | SMB TCP 445 | **Permitted** | ✅ Verified / Closed | Departmental operations; Confirms legitimate departmental access to shared financial resources. |
+| **TC-13** | HR PC (192.168.20.x) / HR | Finance File Server (192.168.10.60) / IT Network | SMB TCP 445 / Any | **Blocked & Logged** | ✅ Verified / Closed | Enforces departmental segregation, workstation isolation, and strict least-privilege access controls. |
+| **TC-14** | Executive Smartphone (Corporate-Secure SSID) / Executive | Active Directory Domain Controller / Finance Server | Kerberos TCP/UDP 88, LDAP 389 / Any | **Permitted** | ✅ Verified / Closed | Executive oversight; Verifies secure enterprise authentication and executive asset access for authorized mobile users. |
+| **TC-15** | Any Unauthorized Host / Executive | Restricted VLAN / Finance PCs | Any | **Blocked & Logged** | ✅ Verified / Closed | Workstation isolation / Implicit Deny; Confirms implicit deny policy and generation of security telemetry for unauthorized lateral access attempts. |
+| **TC-16** | HR PC (192.168.20.x) / HR | HR Servers | Any | **Permitted** | ✅ Verified / Closed | Local department access; Ensures local personnel can access designated infrastructure components. |
+| **TC-17** | DMZ Zone | Internal LAN | Any | **Blocked & Logged** | ✅ Verified / Closed | Public server isolation; Hardens the boundary by ensuring DMZ systems cannot establish unapproved internal socket connections. |
 
 
+📈 Validation Methodology
+
+Testing was performed using both endpoint and infrastructure validation techniques.
+
+Endpoint Validation
+* **Ping**: Validates basic layer-3 reachability and connection continuity.
+* **Traceroute**: Verifies path selection and maps intermediate path hops.
+* **DHCP Lease Verification**: Confirms dynamic IP assignment from correct pools.
+* **DNS Resolution**: Validates local and external domain namespace lookups.
+* **Default Gateway Reachability**: Ensures correct link-layer exit processing.
+
+Infrastructure Validation
+* **VLAN Membership Verification**: Audits access interface configuration alignment.
+* **Trunk Status**: Verifies native VLAN security and trunk encapsulation parameters.
+* **Routing Table Inspection**: Confirms OSPF convergence and static backup paths.
+* **ACL Hit Counters**: Monitors real-time enforcement statistics for security policies.
+* **DHCP Bindings**: Tracks active dynamically leased IP-to-MAC associations.
+* **Interface Status**: Validates physical layer and line protocol operational readiness.
+
+Each successful verification confirms both logical connectivity and policy enforcement.
 
 ## 🛡️ Advanced Engineering Defense Strategies
 
@@ -257,6 +448,19 @@ The network configuration transitions the operational footprint from a high-risk
 - **Policy Rule Accuracy Enforcement:** Granular access lists process every transit transaction accurately, matching explicitly defined rules to block unapproved access paths while permitting standard business functions.
 
 - **End-to-End Environment Performance:** Zero latency impact observed during authorized inter-VLAN communication pathways.
+
+📚 Lessons Learned
+
+This project reinforces the importance of aligning technical controls with business requirements.
+
+Key lessons include:
+* **Effective segmentation dramatically reduces lateral movement**: Isolating workloads into logical domains forces attackers to hit structural perimeters, preventing automated threat propagation.
+* **ACL placement is critical to traffic control**: Applying filters at ingress processing boundaries preserves processing bandwidth and immediately drops malicious traffic before it routes.
+* **Logical design should always mirror security policy**: A perfectly mapped network topology must enforce exact role-based access rules to effectively support structural compliance.
+* **Documentation is as important as implementation**: Maintaining pristine maps, tables, and change records prevents administrative mistakes and facilitates smooth security operations troubleshooting.
+* **Identity and network segmentation complement each other**: Blending centralized identity parameters with hard Layer 2/3 boundaries delivers true context-aware containment.
+* **Enterprise security relies on layered controls**: True network resilience demands multiple complementary checkpoints rather than relying on a single edge device.
+
 
 ## 🧾 Conclusion
 
