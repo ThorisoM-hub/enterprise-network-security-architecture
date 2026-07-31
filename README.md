@@ -4,7 +4,17 @@
 
 This project demonstrates the design and implementation of a segmented enterprise network optimized for high-security environments. It showcases a transition from a vulnerable, flat network architecture to a Role-Based Access Control (RBAC) architecture. By utilizing Virtual Local Area Networks (VLANs), Inter-VLAN routing (Router-on-a-Stick), and Access Control Lists (ACLs), the network ensures that sensitive corporate data remains strictly isolated while maintaining controlled communication lines where business operations dictate.
 
-The network is divided into multiple departments using VLANs, with controlled communication enforced via Access Control Lists (ACLs). Inter-VLAN routing is configured using a Router-on-a-Stick approach, and dynamic IP addressing is provided through DHCP. This project reflects real-world Defense-in-Depth, least privilege, identity boundary alignment, and network segmentation strategies used in modern enterprise cybersecurity.
+The network is divided into multiple departments using VLANs, with controlled communication enforced via Access Control Lists (ACLs). Inter-VLAN routing is configured using a Router-on-a-Stick approach, and dynamic IP addressing is provided through DHCP. This project reflects real-world Defense-in-Depth, least privilege, identity boundary alignment, and network segmentation strategies used in modern enterprise cybersecurity.The implementation focuses on reducing the attack surface while maintaining business functionality through structured Layer 2 and Layer 3 security controls.
+
+Primary Objectives
+* Design a scalable enterprise LAN/WAN using VLAN segmentation.
+* Implement Router-on-a-Stick for inter-VLAN routing.
+* Enforce least-privilege communication using Extended ACLs.
+* Provide centralized DHCP services for automated endpoint configuration.
+* Separate trusted, guest, IoT, management, and DMZ environments.
+* Demonstrate enterprise security architecture suitable for SOC, IAM, and Infrastructure roles.
+* Simulate real-world corporate network deployment using Cisco Packet Tracer
+
 
 ---
 ## ⚙️ Core Skills Demonstrated
