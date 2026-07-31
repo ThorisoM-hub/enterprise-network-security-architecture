@@ -255,6 +255,30 @@ When an unconfigured asset attaches to an access port or logs into a wireless SS
 
 - **Acknowledge (Router Unicast/Broadcast):** The router completes the transaction, logging the device's physical MAC footprint inside its active state table: *"Transaction locked. Your configuration lease is active; default gateways, parameters, and central Active Directory DNS mappings are pushed."*
 
+## 🌐 OSI Model Implementation
+
+This project applies the OSI (Open Systems Interconnection) model throughout the enterprise network design. Each implemented technology maps to one or more OSI layers, demonstrating how enterprise communication is built from physical connectivity through application services.
+
+| OSI Layer | Implementation in this Project | Purpose |
+|-----------|--------------------------------|---------|
+| Layer 7 – Application | DHCP, DNS, HTTP, HTTPS, Syslog, SMB, LDAP/LDAPS | User-facing network services and application communication |
+| Layer 6 – Presentation | TLS/SSL (Conceptual), HTTPS, LDAPS | Secure data encryption and formatting |
+| Layer 5 – Session | TCP Session Establishment | Maintains reliable communication sessions between hosts |
+| Layer 4 – Transport | TCP, UDP, ACL Port Filtering | Reliable transport, connection management, and service-based filtering |
+| Layer 3 – Network | IPv4 Addressing, Router-on-a-Stick, Inter-VLAN Routing, Static Routing, ACL Enforcement | Routing between VLANs and policy enforcement |
+| Layer 2 – Data Link | VLANs, IEEE 802.1Q Trunking, MAC Address Tables, Ethernet Switching | Frame forwarding and logical network segmentation |
+| Layer 1 – Physical | Ethernet Cabling, Cisco 2960 Switches, Cisco 2911 Router, Wireless Access Points | Physical connectivity throughout the enterprise network |
+
+### Security Perspective
+
+Security controls are enforced across multiple OSI layers rather than relying on a single protection mechanism.
+
+- Layer 2: VLAN segmentation reduces broadcast domains and limits lateral movement.
+- Layer 3: Extended ACLs restrict inter-VLAN communication according to business requirements.
+- Layer 4: TCP and UDP port filtering permits only required services.
+- Layer 7: Enterprise services such as DNS, DHCP, LDAP, Syslog, and SMB support business operations while remaining protected by network segmentation.
+
+This layered approach reflects the Defense-in-Depth security model used in modern enterprise environments.
 
 ---
 ## 🎯 Perimeter vs. Internal Boundary Separation
@@ -326,6 +350,11 @@ This model significantly improves organizational capabilities across multiple tr
 
 The architecture therefore demonstrates the integration of cybersecurity operations with physical security, reflecting practices commonly implemented in enterprise environments.
 
+## Security Telemetry
+
+Most deny statements include the log keyword.
+
+In a production environment these log entries would be exported to a centralized SIEM platform using Syslog, allowing SOC analysts to detect unauthorized lateral movement, policy violations, and repeated attack attempts while maintaining an auditable record of network security events.
 ---
 ### 📈 Security Validation,  Testing & ACL Verification Matrix
 
