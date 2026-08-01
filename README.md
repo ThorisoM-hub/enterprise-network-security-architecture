@@ -158,7 +158,26 @@ Static IP addressing is reserved for infrastructure components including:
 * Core Management Devices
 
 Dynamic addressing is provided exclusively through centralized DHCP pools.
+
 ---
+
+## Step 4 – Configure Centralized DHCP Scopes
+### 📋 Enterprise Address Management
+
+Address management follows a structured hierarchy separating dynamic endpoints from critical infrastructure.
+
+Infrastructure devices use static addressing to maintain predictable routing, monitoring, logging, and administrative access. Dynamic addressing is reserved for employee workstations, smartphones, and approved mobile endpoints.
+
+This approach simplifies:
+* **Asset inventory**
+* **Incident response**
+* **SIEM correlation**
+* **DHCP lease auditing**
+* **Vulnerability tracking**
+
+
+---
+
 ### VLAN & Access Policy Table
 
 | VLAN ID | Department | Gateway IP | Subnet Mask | Access Policy | Plain-English Explanation |
@@ -219,9 +238,26 @@ Routing Decision
     │
     ▼
 Destination VLAN
+
 ```
+## 🔄 Enterprise Communication Flow
+
+Traffic entering the enterprise network follows multiple security boundaries before reaching its destination.
+
+1. Client devices generate application traffic.
+2. Ethernet frames are forwarded by the access switch.
+3. IEEE 802.1Q trunk links carry tagged VLAN traffic to the Cisco 2911 router.
+4. Router-on-a-Stick performs Inter-VLAN routing.
+5. Extended ACLs evaluate every routed packet.
+6. Approved traffic reaches enterprise services.
+7. Unauthorized traffic is denied and logged.
+8.Internet-bound traffic exits through the perimeter edge topology toward the Next-Gen Firewall (NGFW) for stateful boundary defense.
+
+This layered inspection model limits lateral movement while ensuring legitimate business communication remains available.
+
 
 For internet-bound traffic, packets are forwarded toward the NGFW before exiting the enterprise boundary where stateful inspection, IPS, and application-layer inspection occur.
+
 🧠 East-West vs North-South Traffic
 
 This project intentionally separates internal and external security responsibilities.
@@ -281,13 +317,59 @@ Security controls are enforced across multiple OSI layers rather than relying on
 This layered approach reflects the Defense-in-Depth security model used in modern enterprise environments.
 
 ---
+
+## 🔌 Enterprise Service Port Reference
+
+The ACL policies implemented throughout this project explicitly permit or deny traffic based on well-known service ports.
+
+| Service | Protocol | Port | Purpose |
+|----------|-----------|------|---------|
+| DNS | UDP | 53 | Domain name resolution |
+| DHCP Server | UDP | 67 | Dynamic IP address allocation |
+| DHCP Client | UDP | 68 | DHCP client communication |
+| HTTP | TCP | 80 | Web traffic |
+| HTTPS | TCP | 443 | Secure web traffic |
+| FTP | TCP | 21 | File transfer (conceptual) |
+| SSH | TCP | 22 | Secure device administration |
+| Telnet | TCP | 23 | Legacy remote management (disabled in production) |
+| SMTP | TCP | 25 | Mail delivery |
+| POP3 | TCP | 110 | Email retrieval |
+| IMAP | TCP | 143 | Email synchronization |
+| LDAP | TCP | 389 | Directory authentication |
+| LDAPS | TCP | 636 | Secure directory authentication |
+| Kerberos | TCP/UDP | 88 | Active Directory authentication |
+| SMB | TCP | 445 | Windows file sharing |
+| Syslog | UDP | 514 | Security log forwarding |
+| NTP | UDP | 123 | Time synchronization |
+| SNMP | UDP | 161 | Network monitoring |
+| SNMP Trap | UDP | 162 | Monitoring alerts |
+| RDP | TCP | 3389 | Remote desktop management |
+| Print Services | TCP | 9100 | Network printer communication |
+
+### ACL Implementation
+
+Only the services required for business operations are explicitly permitted. All unnecessary traffic is denied using the principle of least privilege.
+
+Examples include:
+
+- DNS (UDP 53)
+- DHCP (UDP 67/68)
+- LDAP/LDAPS (389/636)
+- SMB (445)
+- Syslog (514)
+
+All remaining unauthorized traffic is explicitly denied and logged where supported.
+
+---
 ## 🎯 Perimeter vs. Internal Boundary Separation
 
 With the physical network topology upgraded to include an edge security appliance labeled NGFW, the network implements a clear defense-in-depth model:
 * **Active Internal Enforcement (Cisco Router ACLs):** All inter-VLAN, role-based blocking rules (East-West traffic) are configured on the 2911 Edge Router via Extended Access Control Lists applied explicitly to logical subinterfaces. This ensures local containment so unprivileged internal subnets cannot reach restricted databases, identity directories, or backend storage segments.
 * **Perimeter Inspection Layer (NGFW Hardware Placement):** The dedicated edge security appliance is structurally placed at the true internet boundary. This layer is strategically positioned to handle high-compute Layer 7 protection (Application Control, URL Threat Intelligence, and Intrusion Prevention) for all traffic exiting the internal corporate subnets out to the wide-area network (North-South traffic).
 Note: The Next-Generation Firewall (NGFW) shown in the topology is included as an architectural representation of a production enterprise network. Cisco Packet Tracer does not emulate Layer 7 inspection, IPS, or advanced stateful firewall capabilities. These services are represented conceptually and would be implemented using Cisco Firepower, FortiGate, Palo Alto, or pfSense in a production environment or in GNS3/EVE-NG.
+
 ---
+
 ## 🛡️ Firewall & Perimeter Defense Layer
 
 * **Stateful Inspection vs. Stateless ACLs:** Unlike standard stateless ACL router controls that filter blindly on individual packet headers, the perimeter firewall enforces stateful inspection policies. It tracks active TCP connection handshakes originating from high-privilege corporate workstations (Exec Suites, Finance) out toward external web entities, ensuring returning traffic is strictly validated and linked to a verified, established internal session.
@@ -295,6 +377,7 @@ Note: The Next-Generation Firewall (NGFW) shown in the topology is included as a
 * **Integrated Intrusion Prevention Systems (IPS):** The firewall runs dynamic signature matching engines to detect active exploitation attempts, software vulnerabilities, or network-layer scanning sequences targeting the internal corporate environment, generating telemetry drops directly to the security operations center (SOC) log collector.
 
 ---
+
 🔐 Enterprise Security Principles Applied
 
 The architecture follows several internationally recognized cybersecurity principles.
